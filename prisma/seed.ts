@@ -6,6 +6,12 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Seeding database...");
 
+  const courseCount = await prisma.course.count();
+  if (courseCount > 0) {
+    console.log("✅ Database already seeded, skipping...");
+    return;
+  }
+
   // Admin user
   const adminHash = await bcrypt.hash("Admin1234", 12);
   const admin = await prisma.user.upsert({
