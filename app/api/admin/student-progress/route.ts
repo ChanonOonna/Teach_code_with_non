@@ -50,14 +50,14 @@ export async function GET(req: NextRequest) {
             course: { select: { id: true, title: true, slug: true, language: true, totalLessons: true } },
           },
         },
-        lessonProgress: {
+        progress: {
           where: { isCompleted: true },
           select: { completedAt: true },
           orderBy: { completedAt: "desc" },
           take: 1,
         },
         _count: {
-          select: { enrollments: true, lessonProgress: true, quizAttempts: true },
+          select: { enrollments: true, progress: true, quizAttempts: true },
         },
       },
     }),
@@ -74,8 +74,8 @@ export async function GET(req: NextRequest) {
   return apiSuccess({
     students: students.map(s => ({
       ...s,
-      lastActive: s.lessonProgress[0]?.completedAt ?? null,
-      lessonProgress: undefined,
+      lastActive: s.progress[0]?.completedAt ?? null,
+      progress: undefined,
     })),
     pagination: { total, page, limit, totalPages: Math.ceil(total / limit) },
     stats: {
