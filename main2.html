@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevMasteryHub - สื่อการสอนเว็บดีเวลลอปเปอร์ครบวงจร</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg-dark: #0f172a;
+            --sidebar-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --code-bg: #111827;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar สารบัญ */
+        .sidebar {
+            width: 320px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #334155;
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.4rem;
+            color: #fff;
+        }
+
+        .sidebar-header p {
+            font-size: 0.85rem;
+            color: var(--accent);
+        }
+
+        .sidebar-menu {
+            overflow-y: auto;
+            flex: 1;
+            padding: 10px;
+        }
+
+        .part-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin: 15px 0 5px 10px;
+            font-weight: bold;
+            letter-spacing: 0.05em;
+        }
+
+        .chapter-btn {
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .chapter-btn:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+
+        .chapter-btn.active {
+            background-color: var(--primary);
+            color: #fff;
+            font-weight: 500;
+        }
+
+        /* พื้นที่เนื้อหาหลัก */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background-color: #0b0f19;
+        }
+
+        .content-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 10px;
+            border-left: 5px solid var(--primary);
+            padding-left: 15px;
+        }
+
+        p.description {
+            color: var(--text-muted);
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .topic-tag {
+            background-color: #1e293b;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+        }
+
+        .topic-tag strong {
+            color: var(--accent);
+        }
+
+        /* IDE / Code Sandbox Interactive */
+        .sandbox-container {
+            background-color: var(--code-bg);
+            border-radius: 12px;
+            border: 1px solid #334155;
+            overflow: hidden;
+            margin-top: 25px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
+        }
+
+        .sandbox-header {
+            background-color: #1f2937;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #374151;
+        }
+
+        .sandbox-title {
+            font-family: monospace;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .run-btn {
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+
+        .run-btn:hover {
+            background-color: #059669;
+        }
+
+        .sandbox-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: 350px;
+        }
+
+        .code-editor {
+            width: 100%;
+            height: 100%;
+            background-color: #111827;
+            color: #34d399;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 15px;
+            border: none;
+            resize: none;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            outline: none;
+        }
+
+        .preview-pane {
+            background-color: #ffffff;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* หน้า Roadmap พิเศษ */
+        .roadmap-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            padding: 20px 0;
+        }
+
+        .roadmap-step {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 2px solid var(--primary);
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: bold;
+            min-width: 250px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
+            position: relative;
+        }
+
+        .roadmap-arrow {
+            color: var(--accent);
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>DevMasteryHub</h1>
+            <p>สถาบันสอนเว็บเว็บดีเวลลอปเปอร์</p>
+        </div>
+        <div class="sidebar-menu">
+            <div class="part-title">ภาค 1 : HTML Mastery</div>
+            <button class="chapter-btn active" onclick="switchTab('html-ch1')">บทที่ 1 HTML คืออะไร</button>
+            <button class="chapter-btn" onclick="switchTab('html-ch2')">บทที่ 2 Document Structure</button>
+            <button class="chapter-btn" onclick="switchTab('html-ch4')">บทที่ 4 Text Elements</button>
+            <button class="chapter-btn" onclick="switchTab('html-ch9')">บทที่ 9 Forms & Inputs</button>
+            <button class="chapter-btn" onclick="switchTab('html-ch12')">บทที่ 12 Semantic HTML</button>
+
+            <div class="part-title">ภาค 2 : CSS Mastery</div>
+            <button class="chapter-btn" onclick="switchTab('css-ch1')">บทที่ 1 CSS Fundamentals</button>
+            <button class="chapter-btn" onclick="switchTab('css-ch6')">บทที่ 6 Box Model</button>
+            <button class="chapter-btn" onclick="switchTab('css-ch9')">บทที่ 9 Flexbox & Grid</button>
+            <button class="chapter-btn" onclick="switchTab('css-ch14')">บทที่ 14 Animation</button>
+
+            <div class="part-title">ภาค 3 : JavaScript Mastery</div>
+            <button class="chapter-btn" onclick="switchTab('js-ch1')">บทที่ 1 JS Fundamentals</button>
+            <button class="chapter-btn" onclick="switchTab('js-ch9')">บทที่ 9 Array Methods</button>
+            <button class="chapter-btn" onclick="switchTab('js-ch10')">บทที่ 10 DOM & Events</button>
+            <button class="chapter-btn" onclick="switchTab('js-ch20')">บทที่ 20 Event Loop (Senior)</button>
+
+            <div class="part-title">ภาค 4 : Advanced Dev</div>
+            <button class="chapter-btn" onclick="switchTab('adv-ecosystem')">Modern Ecosystem</button>
+            <button class="chapter-btn" onclick="switchTab('adv-roadmap')">🏁 Ultimate Roadmap</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="content-body">
+
+            <div id="html-ch1" class="content-section active">
+                <h2>บทที่ 1 HTML คืออะไร & ประวัติความเป็นมา</h2>
+                <p class="description">HyperText Markup Language คือภาษาโครงสร้างหลักของเว็บไซต์ทั่วโลก</p>
+                <div class="topics-grid">
+                    <div class="topic-tag"><strong>History:</strong> จุดเริ่มต้นจาก Tim Berners-Lee ปี 1991</div>
+                    <div class="topic-tag"><strong>HTML4 & XHTML:</strong> ยุคแห่งความเข้มงวดของ Syntax (XML-based)</div>
+                    <div class="topic-tag"><strong>HTML5:</strong> ยุคปัจจุบัน รองรับ Multimedia และ Semantic Web</div>
+                    <div class="topic-tag"><strong>W3C & WHATWG:</strong> สององค์กรผู้ร่วมกำหนดมาตรฐานเว็บในปัจจุบัน</div>
+                </div>
+                
+                <div class="sandbox-container">
+                    <div class="sandbox-header">
+                        <span class="sandbox-title">index.html (ทดลองแก้ไขโค้ดด้านล่างได้)</span>
+                        <button class="run-btn" onclick="runSandbox('html-ch1')">Run Code</button>
+                    </div>
+                    <div class="sandbox-split">
+                        <textarea id="code-html-ch1" class="code-editor"><h1>สวัสดีชาวโลก! นี่คือ HTML5</h1>
+<p>ยินดีต้อนรับสู่บทเรียนแรกของการเป็น Web Developer</p>
+<hr>
+<p style="color: cyan;">ลองแก้ไขข้อความตรงนี้แล้วกดปุ่ม Run Code ด้านบนดูสิ!</p></textarea>
+                        <iframe id="preview-html-ch1" class="preview-pane"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <div id="html-ch2" class="content-section">
+                <h2>บทที่ 2 HTML Document Structure</h2>
+                <p class="description">โครงสร้างพื้นฐานที่ทุกๆ ไฟล์ HTML จำเป็นต้องมีเพื่อให้เบราว์เซอร์อ่านค่าได้ถูกต้อง</p>
+                <div class="topics-grid">
+                    <div class="topic-tag"><strong>&lt;!DOCTYPE html&gt;:</strong> ประกาศว่านี่คือ HTML5</div>
+                    <div class="topic-tag"><strong>&lt;html&gt;:</strong> รากเหง้า (Root Element) ของเอกสาร</div>
+                    <div class="topic-tag"><strong>&lt;head&gt;:</strong> ส่วนเก็บข้อมูล Metadata, Title, Link CSS (ไม่แสดงบนเว็บ)</div>
+                    <div class="topic-tag"><strong>&lt;body&gt;:</strong> ส่วนเนื้อหาหลักที่จะไปปรากฏให้ผู้ใช้งานเห็น</div>
+                </div>
+
+                <div class="sandbox-container">
+                    <div class="sandbox-header">
+                        <span class="sandbox-title">Structure Demo</span>
+                        <button class="run-btn" onclick="runSandbox('html-ch2')">Run Code</button>
+                    </div>
+                    <div class="sandbox-split">
+                        <textarea id="code-html-ch2" class="code-editor"><!DOCTYPE html>
+<html>
+<head>
+    <title>หน้าแรกของฉัน</title>
+</head>
+<body style="background-color: #f0fdf4; color: #166534; padding: 20px;">
+    <h2>นี่คือพื้นที่ภายใน Body</h2>
+    <p>ทุกอย่างที่พิมพ์ตรงนี้จะแสดงผลบนเบราว์เซอร์ให้ User เห็น</p>
+</body>
+</html></textarea>
+                        <iframe id="preview-html-ch2" class="preview-pane"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <div id="html-ch4" class="content-section">
+                <h2>บทที่ 4 Text Elements</h2>
+                <p class="description">Tag สำหรับจัดการกับข้อความ ไม่ว่าจะเป็นหัวข้อ ย่อหน้า หรือการเน้นข้อความตัวหนา/ตัวเอียง</p>
+                <div class="topics-grid">
+                    <div class="topic-tag"><strong>h1-h6:</strong> Headings ลำดับความสำคัญ</div>
+                    <div class="topic-tag"><strong>p:</strong> Paragraph ย่อหน้าข้อความ</div>
+                    <div class="topic-tag"><strong>strong / b:</strong> ข้อความตัวหนา (Strong เน้นความหมาย)</div>
+                    <div class="topic-tag"><strong>em / i:</strong> ข้อความตัวเอียง (Emphasize เน้นเสียงหนักเบา)</div>
+                </div>
+
+                <div class="sandbox-container">
+                    <div class="sandbox-header">
+                        <span class="sandbox-title">Text Typography</span>
+                        <button class="run-btn" onclick="runSandbox('html-ch4')">Run Code</button>
+                    </div>
+                    <div class="sandbox-split">
+                        <textarea id="code-html-ch4" class="code-editor">
+<h1>หัวข้อหลัก H1</h1>
+<h3>หัวข้อย่อย H3</h3>
+<p>นี่คือย่อหน้าปกติธรรมดา แต่เราสามารถเพิ่ม 
+    <strong>ตัวหนาแบบสำคัญ</strong> หรือจะทำเป็น 
+    <em>ตัวเอียงแบบเน้นย้ำ</em> ก็ได้
+</p>
+<p>นอกจากนี้ยังมี 
+    <mark>การไฮไลท์คำ (Mark)</mark> 
+    และตัวห้อย H<sub>2</sub>O 
+    หรือตัวยก 2<sup>10</sup> อีกด้วยนะ!
+</p>
+                        </textarea>
+                        <iframe id="preview-html-ch4" class="preview-pane"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <div id="html-ch9" class="content-section">
+                <h2>บทที่ 9 Forms & Input Types</h2>
+                <p class="description">เครื่องมือสำหรับรับข้อมูลจาก User ส่งไปยังเซิร์ฟเวอร์</p>
+                
+                <div class="sandbox-container">
+                    <div class="sandbox-header">
+                        <span class="sandbox-title">Form Showcase</span>
+                        <button class="run-btn" onclick="runSandbox('html-ch9')">Run Code</button>
+                    </div>
+                    <div class="sandbox-split">
+                        <textarea id="code-html-ch9" class="code-editor"><form style="padding:15px; font-family:sans-serif;" onsubmit="alert('ส่งข้อมูลสำเร็จ!'); return false;">
+  <fieldset style="border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+    <legend>สมัครสมาชิกใหม่</legend>
+    
+    <label>ชื่อผู้ใช้: </label><br>
+    <input type="text" placeholder="ระบุ Username" required><br><br>
+    
+    <label>อีเมล: </label><br>
+    <input type="email" placeholder="example@mail.com" required><br><br>
+    
+    <label>ระดับความหล่อ: </label>
+    <input type="range" min="1" max="100"><br><br>
+    
+    <label>สีที่ชอบ: </label>
+    <input type="color"><br><br>
+    
+    <button type="submit" style="background: blue; color: white; padding: 5px 15px; border:none; border-radius:3px; cursor:pointer;">ลงทะเบียน</button>
+  </fieldset>
+</form></textarea>
+                        <iframe id="preview-html-ch9" class="preview-pane"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <div id="html-ch12" class="content-section">
+                <h2>บทที่ 12 Semantic HTML</h2>
+                <p class="description">การใช้ Tag ที่มีความหมายชัดเจน เพื่อช่วยให้ Search Engine (SEO) และ Screen Reader เข้าใจโครงสร้างเว็บได้ดีที่สุด</p>
+                <div class="topics-grid">
+                    <div class="topic-tag"><strong>&lt;header&gt;:</strong> ส่วนหัวของหน้าเว็บ/บทความ</div>
+                    <div class="topic-tag"><strong>&lt;nav&gt;:</strong> เมนูนำทาง ลิงก์ต่างๆ</div>
+                    <div class="topic-tag"><strong>&lt;main&gt;:</strong> เนื้อหาหลักอันเดียวของหน้านั้น</div>
+                    <div class="topic-tag"><strong>&lt;section&gt;:</strong> การจัดกลุ่มเนื้อหาที่มีหัวข้อเกี่ยวข้องกัน</div>
+                    <div class="topic-tag"><strong>&lt;article&gt;:</strong> เนื้อหาที่สมบูรณ์ในตัวเอง (เช่น บล็อก, โพสต์ข่าว)</div>
+                    <div class="topic-tag"><strong>&lt;footer&gt;:</strong> ส่วนท้ายของหน้าเว็บ</div>
+                </div>
+            </div>
+
+            <div id="css-ch1" class="content-section">
+                <h2>บทที่ 1 CSS Fundamentals & Selectors</h2>
+                <p class="description">Cascading Style Sheets ภาษาแต่งองค์ทรงเครื่องให้เว็บสวยงาม เข้าใจเรื่อง Cascade, Specificity (ลำดับความสำคัญของสไตล์)</p>
+
+                <div class="sandbox-container">
+                    <div class="sandbox-header">
+                        <span class="sandbox-title">CSS Syntax & Specificity</span>
+                        <button class="run-btn" onclick="runSandbox('css-ch1')">Run Code</button>
+                    </div>
+                    <div class="sandbox-split">
+                        <textarea id="code-css-ch1" class="code-editor"><style>
+  /* Element Selector */
+  p { color: gray; font-size: 16px; }
+  
+  /* Class Selector (สำคัญกว่า Element) */
+  .highlight { color: orange; font-weight: bold; }
+  
+  /* ID Selector (สำคัญที่สุดในกลุ่มนี้) */
+  #unique-text { color: red; text-decoration: underline; }
+</style>
+
+<p>นี่คือข้อความปกติ (โดน Selector p)</p>
+<p class="highlight">นี่คือข้อความติด Class highlight</p>
+<p id="unique-text" class="highlight">นี่คือข้อความติดทั้ง ID และ Class (ลองดูว่าสีไหนชนะ!)</p></textarea>
+                        <iframe id="preview-css-ch1" class="preview-pane"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <div id="css-ch6" class="content-section">
+                <h2>บทที่ 6 CSS Box Model</h2>
+                <p class="description">ทุกสิ่งทุกอย่างบนโลก CSS ล้วนเป็น "กล่องสี่เหลี่ยม" ประกอบด้วย Content, Padding, Border, Margin</p>
+
+                <div class="sandbox-container">
+                    <div class="sandbox-header">
+                        <span class="sandbox-title">Box Model Visualization</span>
+                        <button class="run-btn" onclick="runSandbox('css-ch6')">Run Code</button>
+                    </div>
+                    <div class="sandbox-split">
+                        <textarea id="code-css-ch6" class="code-editor"><style>
+  .box {
+    width: 200px;
+    height: 100px;
+    background-color: #38bdf8;
+    color: black;
+    
+    padding: 20px;     /* ระยะห่างด้านในกล่อง */
+    border: 5px solid #0369a1; /* เส้นขอบกล่อง */
+    margin: 30px;      /* ระยะห่างภายนอกกล่อง */
+    
+    font-family: sans-serif;
+  }
+</style>
+
+<div class="box">นี่คือกล่องสี่เหลี่ยม</div>
+<p style="color: #fff; background: gray;">กล่องข้อความภายนอกถัดไป โดนดันออกจากตัว Margin</p></textarea>
+                        <iframe id="preview-css-ch6" class="preview-pane"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <div id="css-ch9" class="content-section">
+                <h2>บทที่ 9 Flexbox & Grid Layout</h2>
+                <p class="description">ระบบการจัดหน้ากระดาษ (Layout) ยอดนิยมในปัจจุบันที่ลบยุคของการลอยวัตถุแบบเก่าไปอย่างสิ้นเชิง</p>
+
+                <div class="sandbox-container">
+                    <div class="sandbox-header">
+                        <span class="sandbox-title">Flexbox vs Grid</span>
+                        <button class="run-btn" onclick="runSandbox('css-ch9')">Run Code</button>
+                    </div>
+                    <div class="sandbox-split">
+                        <textarea id="code-css-ch9" class="code-editor"><style>
+  /* Flexbox Setup (จัดแกนเดียวแบบยืดหยุ่น) */
+  .flex-container {
+    display: flex;
+    justify-content: space-around;
+    background-color: #e2e8f0;
+    padding: 10px;
+    margin-bottom: 20px;
+  }
+  .item { background: #3b82f6; color: white; padding: 15px; border-radius: 5px; }
+
+  /* Grid Setup (จัดสองแกน แถว/คอลัมน์ แม่นยำ) */
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    background-color: #cbd5e1;
+    padding: 10px;
+  }
+  .grid-item { background: #ec4899; color: white; padding: 20px; text-align: center; }
+</style>
+
+<h3 style="font-family: sans-serif;">Flexbox Container</h3>
+<div class="flex-container">
+  <div class="item">Item 1</div>
+  <div class="item">Item 2 ยืดตามความยาวข้อความ</div>
+  <div class="item">Item 3</div>
+</div>
+
+<h3 style="font-family: sans-serif;">Grid Container (3 Columns เท่ากัน)</h3>
+<div class="grid-container">
+  <div class="grid-item">A</div> <div class="grid-item">B</div> <div class="grid-item">C</div>
+  <div class="grid-item">D</div> <div class="grid-item">E</div> <div class="grid-item">F</div>
+</div></textarea>
+                        <iframe id="preview-css-ch9" class="preview-pane"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <div id="css-ch14" class="content-section">
+                <h2>บทที่ 14 CSS Animation</h2>
+                <p class="description">สร้างความเคลื่อนไหวให้เว็บมีชีวิตชีวาด้วยพลังแห่ง `@keyframes`</p>
+
+                <div class="sandbox-container">
+                    <div class="sandbox-header">
+                        <span class="sandbox-title">Animation Player</span>
+                        <button class="run-btn" onclick="runSandbox('css-ch14')">Run Code</button>
+                    </div>
+                    <div class="sandbox-split">
+                        <textarea id="code-css-ch14" class="code-editor"><style>
+  @keyframes spinAndColor {
+    0% { transform: rotate(0deg); background-color: red; left: 0px; }
+    50% { background-color: yellow; border-radius: 50%; }
+    100% { transform: rotate(360deg); background-color: blue; left: 200px; }
+  }
+
+  .animated-box {
+    width: 80px;
+    height: 80px;
+    position: relative;
+    animation-name: spinAndColor;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+  }
+</style>
+
+<div style="padding: 20px;">
+  <div class="animated-box"></div>
+</div></textarea>
+                        <iframe id="preview-css-ch14" class="preview-pane"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <div id="js-ch1" class="content-section">
+                <h2>บทที่ 1 JavaScript Fundamentals</h2>
+                <p class="description">เปิดสมองให้หน้าเว็บสามารถคิด คำนวณ และตัดสินใจได้ด้วยตรรกะโปรแกรมมิ่ง</p>
+
+                <div class="sandbox-container">
+                    <div class="sandbox-header">
+                        <span class="sandbox-title">Console & Script Test</span>
+                        <button class="run-btn" onclick="runSandbox('js-ch1')">Run Code</button>
+                    </div>
+                    <div class="sandbox-split">
+                        <textarea id="code-js-ch1" class="code-editor"><div id="output" style="font-family: monospace; font-size: 1.2rem; padding: 20px;"></div>
+
+<script>
+  // Variables & Operators
+  let name = "เบลล่า";
+  const birthYear = 2000;
+  let currentYear = 2026;
+  let age = currentYear - birthYear;
+
+  // Control Flow
+  let statusText = "";
+  if (age >= 20) {
+      statusText = "คุณบรรลุนิติภาวะแล้ว";
+  } else {
+      statusText = "คุณยังเป็นเยาวชน";
+  }
+
+  // แสดงผลลัพธ์ลงบนหน้าจอหน้าเว็บ
+  document.getElementById('output').innerHTML = 
+    `สวัสดีคุณ ${name}<br>` +
+    `ปีนี้ปี ${currentYear} คุณมีอายุ ${age} ปี<br>` +
+    `สถานะ: <strong>${statusText}</strong>`;
+</script></textarea>
+                        <iframe id="preview-js-ch1" class="preview-pane"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <div id="js-ch9" class="content-section">
+                <h2>บทที่ 9 Array Methods High-Order Functions</h2>
+                <p class="description">หัวใจหลักในการทำแอปพลิเคชันยุคใหม่ คือการจัดสรรและกรองข้อมูลอาเรย์ด้วย Map, Filter, Reduce</p>
+
+                <div class="sandbox-container">
+                    <div class="sandbox-header">
+                        <span class="sandbox-title">Array Modern Methods</span>
+                        <button class="run-btn" onclick="runSandbox('js-ch9')">Run Code</button>
+                    </div>
+                    <div class="sandbox-split">
+                        <textarea id="code-js-ch9" class="code-editor"><div id="display" style="font-family:sans-serif; padding:15px;"></div>
+
+<script>
+  const products = [
+    { name: 'Laptop', price: 35000, category: 'tech' },
+    { name: 'Shirt', price: 590, category: 'clothes' },
+    { name: 'Smartphone', price: 22000, category: 'tech' },
+    { name: 'Shoes', price: 2500, category: 'clothes' }
+  ];
+
+  // 1. Filter เฉพาะสินค้าหมวดไอที
+  const techProducts = products.filter(item => item.category === 'tech');
+
+  // 2. Map ทำลายล้างโครงสร้างเดิมเพื่อวาดข้อความ HTML ใหม่
+  const htmlList = techProducts.map(item => `<li>${item.name} ราคา: ${item.price} บาท</li>`).join('');
+
+  document.getElementById('display').innerHTML = `
+    <h3>สินค้าไอทีที่คัดกรองแล้ว (Filter + Map):</h3>
+    <ul>${htmlList}</ul>
+  `;
+</script></textarea>
+                        <iframe id="preview-js-ch9" class="preview-pane"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <div id="js-ch10" class="content-section">
+                <h2>บทที่ 10 DOM & Event Listeners</h2>
+                <p class="description">Document Object Model คือการเชื่อมต่อคำสั่งเบราว์เซอร์เข้ากับสไตล์และวัตถุ เพื่อรอรับแรงกระแทกจาก Event (การกด การพิม)</p>
+
+                <div class="sandbox-container">
+                    <div class="sandbox-header">
+                        <span class="sandbox-title">DOM Interaction Box</span>
+                        <button class="run-btn" onclick="runSandbox('js-ch10')">Run Code</button>
+                    </div>
+                    <div class="sandbox-split">
+                        <textarea id="code-js-ch10" class="code-editor"><button id="magic-btn" style="padding:10px 20px; font-size:1rem; cursor:pointer;">
+    คลิกเพื่อร่ายมนตร์คาถา
+</button>
+
+<div id="target-box" style="width:100px; height:100px; background:gray; margin-top:20px; transition:0.3s; display:flex; align-items:center; justify-content:center; color:white; font-family:sans-serif;">
+    กล่องว่าง
+</div>
+
+<script>
+  const btn = document.getElementById('magic-btn');
+  const box = document.getElementById('target-box');
+
+  // ผูกการทำงาน Event 'click'
+  btn.addEventListener('click', () => {
+      box.style.backgroundColor = 'purple';
+      box.style.width = '250px';
+      box.style.borderRadius = '15px';
+      box.innerText = '⚡️ สำเร็จเวทมนตร์!';
+  });
+</script></textarea>
+                        <iframe id="preview-js-ch10" class="preview-pane"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <div id="js-ch20" class="content-section">
+                <h2>บทที่ 20 Event Loop & Concurrency Model (Senior Level)</h2>
+                <p class="description">เจาะลึกกลไกเบื้องหลังของ V8 Engine ในการทำงานแบบ Single-threaded แบบ Asynchronous ไม่ให้เว็บค้าง</p>
+                <div class="topics-grid">
+                    <div class="topic-tag"><strong>Call Stack:</strong> ด่านหน้าทำคำสั่ง Synchronous ทันทีแบบ LIFO</div>
+                    <div class="topic-tag"><strong>Web APIs:</strong> ขอยืมแรงเบราว์เซอร์ทำของช้า เช่น setTimeout, fetch</div>
+                    <div class="topic-tag"><strong>Microtask Queue:</strong> แถวแซงคิวพิเศษระดับสูง (Promise.then, async/await)</div>
+                    <div class="topic-tag"><strong>Callback Queue:</strong> แถวปกติสำหรับการทำงานระดับแมคโคร (setTimeout)</div>
+                </div>
+                <blockquote style="background:#1e293b; padding:15px; border-left:4px solid var(--accent); margin-top:15px; font-style:italic;">
+                    "Event Loop มีหน้าที่คอยตรวจสอบว่าถ้า Call Stack ว่างลง มันจะวิ่งไปหยิบงานจาก Microtask Queue มาทำก่อน แล้วค่อยตามด้วย Callback Queue เสมอ"
+                </blockquote>
+            </div>
+
+            <div id="adv-ecosystem" class="content-section">
+                <h2>ภาค 4 : สิ่งที่ Developer ต้องเรียนต่อในโลกปัจจุบัน</h2>
+                <p class="description">หลังจากแม่นยำ HTML/CSS/JS แล้ว นี่คือสแต็กเทคโนโลยีที่คุณต้องเลือกเดินต่อไปเพื่อก้าวสู่สายอาชีพแบบมืออาชีพ</p>
+                
+                <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.95rem;">
+                    <thead>
+                        <tr style="background-color: var(--sidebar-bg); text-align: left;">
+                            <th style="padding: 12px; border: 1px solid #334155; color: var(--accent);">ประเภทเครื่องมือ</th>
+                            <th style="padding: 12px; border: 1px solid #334155; color: var(--accent);">เทคโนโลยียอดฮิต</th>
+                            <th style="padding: 12px; border: 1px solid #334155; color: var(--accent);">ความสำคัญ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 12px; border: 1px solid #334155;">Version Control</td>
+                            <td style="padding: 12px; border: 1px solid #334155; font-weight: bold;">Git (GitHub / GitLab)</td>
+                            <td style="padding: 12px; border: 1px solid #334155;">บันทึกประวัติการแก้โค้ด ทำงานร่วมกันเป็นทีมโดยโค้ดไม่พังทับกัน</td>
+                        </tr>
+                        <tr style="background-color: rgba(255,255,255,0.02)">
+                            <td style="padding: 12px; border: 1px solid #334155;">Build Tool & Package</td>
+                            <td style="padding: 12px; border: 1px solid #334155; font-weight: bold;">npm / pnpm / Vite</td>
+                            <td style="padding: 12px; border: 1px solid #334155;">จัดการดาวน์โหลด Lib ภายนอก และรวมไฟล์มัดแพ็กเว็บให้เร็วปรี๊ด</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px; border: 1px solid #334155;">Frontend Framework</td>
+                            <td style="padding: 12px; border: 1px solid #334155; font-weight: bold;">TypeScript + React / Next.js</td>
+                            <td style="padding: 12px; border: 1px solid #334155;">ทำแอปพลิเคชันขนาดใหญ่ด้วย Component และดึงข้อมูลแบบ SSR / SSG</td>
+                        </tr>
+                        <tr style="background-color: rgba(255,255,255,0.02)">
+                            <td style="padding: 12px; border: 1px solid #334155;">Backend & Database</td>
+                            <td style="padding: 12px; border: 1px solid #334155; font-weight: bold;">Node.js (Express) + PostgreSQL / MongoDB</td>
+                            <td style="padding: 12px; border: 1px solid #334155;">สร้าง API, จัดการระบบล็อกอิน (JWT), เก็บฐานข้อมูลถาวรอย่างปลอดภัย</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px; border: 1px solid #334155;">Deployment & Cloud</td>
+                            <td style="padding: 12px; border: 1px solid #334155; font-weight: bold;">Docker / Vercel / AWS / CI-CD</td>
+                            <td style="padding: 12px; border: 1px solid #334155;">จำลอง Container เสกเว็บขึ้นสู่อินเทอร์เน็ตจริงให้ผู้ใช้งานทั่วโลกเข้าชม</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="adv-roadmap" class="content-section">
+                <h2>🏁 ลำดับลำเลียงการศึกษา (The Ultimate Developer Roadmap)</h2>
+                <p class="description" style="text-align: center;">เรียนรู้ตามเข็มทิศทิศทางนี้ทีละขั้นเพื่อไม่ให้สมองไหม้ (Brain Melt)</p>
+                
+                <div class="roadmap-container">
+                    <div class="roadmap-step">🌐 Internet & Browser Works</div>
+                    <div class="roadmap-arrow">↓</div>
+                    <div class="roadmap-step" style="border-color:#f97316;">🧱 HTML5 Foundation</div>
+                    <div class="roadmap-arrow">↓</div>
+                    <div class="roadmap-step" style="border-color:#3b82f6;">🎨 CSS3 & Responsive Design</div>
+                    <div class="roadmap-arrow">↓</div>
+                    <div class="roadmap-step" style="border-color:#eab308;">🧠 JavaScript Basics & DOM</div>
+                    <div class="roadmap-arrow">↓</div>
+                    <div class="roadmap-step" style="border-color:#a855f7;">⏳ Async JS & Fetch API</div>
+                    <div class="roadmap-arrow">↓</div>
+                    <div class="roadmap-step" style="border-color:#10b981;">🐙 Git & GitHub</div>
+                    <div class="roadmap-arrow">↓</div>
+                    <div class="roadmap-step" style="border-color:#06b6d4;">⚛️ React.js & TypeScript</div>
+                    <div class="roadmap-arrow">↓</div>
+                    <div class="roadmap-step" style="border-color:#6366f1;">🚀 Next.js (Fullstack Framework)</div>
+                    <div class="roadmap-arrow">↓</div>
+                    <div class="roadmap-step" style="border-color:#ec4899;">🗄️ Node.js Backend & Database</div>
+                    <div class="roadmap-arrow">↓</div>
+                    <div class="roadmap-step" style="border-color:#14b8a6;">🐳 Docker & Cloud Deployment</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // ระบบสลับเปลี่ยนหน้าบทเรียน (Tabs)
+        function switchTab(sectionId) {
+            // ซ่อนทุกหน้าบทเรียน
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(sec => sec.classList.remove('active'));
+            
+            // ลบสถานะ active จากปุ่มทั้งหมดบน sidebar
+            const buttons = document.querySelectorAll('.chapter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // เปิดหน้าปัจจุบัน
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+            
+            // ใส่สีปุ่มที่กดเลือก
+            const eventButton = window.event ? window.event.currentTarget : null;
+            if (eventButton) {
+                eventButton.classList.add('active');
+            } else {
+                // ค้นหาปุ่มที่มี onclick สอดคล้องกับ id
+                buttons.forEach(btn => {
+                    if(btn.getAttribute('onclick').includes(sectionId)) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+
+            // ถ้าบทเรียนนั้นมีกล่องแซนบ็อกซ์ ให้คอมไพล์โค้ดเริ่มต้นทันที
+            if(document.getElementById(`code-${sectionId}`)) {
+                runSandbox(sectionId);
+            }
+        }
+
+        // ระบบรันโค้ด Sandbox สดๆ ผ่าน iframe
+        function runSandbox(id) {
+            const code = document.getElementById(`code-${id}`).value;
+            const iframe = document.getElementById(`preview-${id}`);
+            
+            // ทำการ Inject โค้ด HTML/CSS/JS เข้าไปใน Context ของ iframe
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            iframeDoc.open();
+            iframeDoc.write(code);
+            iframeDoc.close();
+        }
+
+        // สั่งคอมไพล์หน้ารันเริ่มต้นทันทีเมื่อเปิดเว็บบนเบราว์เซอร์
+        window.onload = function() {
+            runSandbox('html-ch1');
+        };
+    </script>
+</body>
+</html>

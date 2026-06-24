@@ -1,0 +1,467 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ============ USERS ============
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  username      String    @unique
+  passwordHash  String?
+  googleId      String?   @unique
+  displayName   String
+  avatar        String?
+  bio           String?   @db.Text
+  role          UserRole  @default(STUDENT)
+  isActive      Boolean   @default(true)
+  emailVerified Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  enrollments   Enrollment[]
+  progress      LessonProgress[]
+  quizAttempts  QuizAttempt[]
+  assignments   AssignmentSubmission[]
+  achievements  UserAchievement[]
+  notes         Note[]
+  bookmarks     Bookmark[]
+  notifications Notification[]
+  refreshTokens  RefreshToken[]
+  certificates  Certificate[]
+  loginHistory  LoginHistory[]
+
+  @@map("users")
+}
+
+model LoginHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  method    String   // "password" | "google"
+  ip        String?
+  userAgent String?  @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("login_history")
+}
+
+enum UserRole {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique @db.VarChar(512)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
+}
+
+model PasswordReset {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique @db.VarChar(512)
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@map("password_resets")
+}
+
+// ============ COURSES ============
+model Course {
+  id          String       @id @default(cuid())
+  slug        String       @unique
+  title       String
+  description String       @db.Text
+  thumbnail   String?
+  language    Language
+  level       Level        @default(BEGINNER)
+  isPublished Boolean      @default(false)
+  isFeatured  Boolean      @default(false)
+  order       Int          @default(0)
+  totalLessons Int         @default(0)
+  totalQuizzes Int         @default(0)
+  estimatedHours Float     @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  // Relations
+  sections    Section[]
+  enrollments Enrollment[]
+  certificates Certificate[]
+
+  @@map("courses")
+}
+
+enum Language {
+  C
+  CPP
+  JAVASCRIPT
+  JAVA
+  PYTHON
+  TYPESCRIPT
+  HTML_CSS
+  REACT
+  NEXTJS
+  VUE
+  ANGULAR
+  NODEJS
+  EXPRESS
+  SQL
+  FLUTTER
+  REACT_NATIVE
+  DEVOPS
+  GENERAL
+}
+
+enum Level {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+model Section {
+  id          String   @id @default(cuid())
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title       String
+  description String?  @db.Text
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  lessons     Lesson[]
+
+  @@map("sections")
+}
+
+// ============ LESSONS ============
+model Lesson {
+  id          String      @id @default(cuid())
+  sectionId   String
+  section     Section     @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  slug        String      @unique
+  title       String
+  content     String      @db.LongText
+  videoUrl    String?
+  duration    Int         @default(0)
+  order       Int         @default(0)
+  type        LessonType  @default(TEXT)
+  isPublished Boolean     @default(true)
+  isFree      Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  progress    LessonProgress[]
+  codeExamples CodeExample[]
+  quizzes     Quiz[]
+  assignments Assignment[]
+  notes       Note[]
+  bookmarks   Bookmark[]
+
+  @@map("lessons")
+}
+
+enum LessonType {
+  TEXT
+  VIDEO
+  INTERACTIVE
+  PROJECT
+}
+
+model CodeExample {
+  id          String   @id @default(cuid())
+  lessonId    String
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  title       String
+  code        String   @db.LongText
+  language    String
+  explanation String?  @db.Text
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  @@map("code_examples")
+}
+
+// ============ PROGRESS ============
+model Enrollment {
+  id          String           @id @default(cuid())
+  userId      String
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId    String
+  course      Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  enrolledAt  DateTime         @default(now())
+  completedAt DateTime?
+  progress    Float            @default(0)
+  status      EnrollmentStatus @default(ACTIVE)
+
+  @@unique([userId, courseId])
+  @@map("enrollments")
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  DROPPED
+}
+
+model LessonProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId    String
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  isCompleted Boolean  @default(false)
+  completedAt DateTime?
+  timeSpent   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, lessonId])
+  @@map("lesson_progress")
+}
+
+// ============ QUIZ ============
+model Quiz {
+  id          String       @id @default(cuid())
+  lessonId    String
+  lesson      Lesson       @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  title       String
+  description String?      @db.Text
+  passingScore Int         @default(70)
+  timeLimit   Int?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  questions   Question[]
+  attempts    QuizAttempt[]
+
+  @@map("quizzes")
+}
+
+model Question {
+  id           String       @id @default(cuid())
+  quizId       String
+  quiz         Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  text         String       @db.Text
+  type         QuestionType @default(MULTIPLE_CHOICE)
+  explanation  String?      @db.Text
+  order        Int          @default(0)
+  points       Int          @default(1)
+
+  choices      Choice[]
+  answers      Answer[]
+
+  @@map("questions")
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+  SHORT_ANSWER
+  CODE
+}
+
+model Choice {
+  id         String   @id @default(cuid())
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  text       String   @db.Text
+  isCorrect  Boolean  @default(false)
+  order      Int      @default(0)
+
+  answers    Answer[]
+
+  @@map("choices")
+}
+
+model QuizAttempt {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quizId      String
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  score       Float    @default(0)
+  isPassed    Boolean  @default(false)
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  timeSpent   Int      @default(0)
+
+  answers     Answer[]
+
+  @@map("quiz_attempts")
+}
+
+model Answer {
+  id            String      @id @default(cuid())
+  attemptId     String
+  attempt       QuizAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId    String
+  question      Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  choiceId      String?
+  choice        Choice?     @relation(fields: [choiceId], references: [id])
+  textAnswer    String?     @db.Text
+  isCorrect     Boolean     @default(false)
+
+  @@map("answers")
+}
+
+// ============ ASSIGNMENTS ============
+model Assignment {
+  id           String     @id @default(cuid())
+  lessonId     String
+  lesson       Lesson     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  title        String
+  description  String     @db.LongText
+  starterCode  String?    @db.LongText
+  language     String
+  expectedOutput String?  @db.Text
+  hints        String?    @db.Text
+  dueDate      DateTime?
+  maxScore     Int        @default(100)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  submissions  AssignmentSubmission[]
+
+  @@map("assignments")
+}
+
+model AssignmentSubmission {
+  id           String           @id @default(cuid())
+  assignmentId String
+  assignment   Assignment       @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  code         String           @db.LongText
+  output       String?          @db.Text
+  score        Float?
+  feedback     String?          @db.Text
+  status       SubmissionStatus @default(PENDING)
+  submittedAt  DateTime         @default(now())
+  gradedAt     DateTime?
+
+  @@map("assignment_submissions")
+}
+
+enum SubmissionStatus {
+  PENDING
+  GRADED
+  RETURNED
+}
+
+// ============ ACHIEVEMENTS ============
+model Achievement {
+  id          String              @id @default(cuid())
+  name        String
+  description String
+  icon        String
+  type        AchievementType
+  condition   String
+  points      Int                 @default(10)
+  createdAt   DateTime            @default(now())
+
+  users       UserAchievement[]
+
+  @@map("achievements")
+}
+
+enum AchievementType {
+  LESSON_COMPLETE
+  COURSE_COMPLETE
+  QUIZ_PERFECT
+  STREAK
+  SPEED
+  SPECIAL
+}
+
+model UserAchievement {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  earnedAt      DateTime    @default(now())
+
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+// ============ NOTES & BOOKMARKS ============
+model Note {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId  String
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("notes")
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId  String
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, lessonId])
+  @@map("bookmarks")
+}
+
+// ============ NOTIFICATIONS ============
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String           @db.Text
+  type      NotificationType @default(INFO)
+  isRead    Boolean          @default(false)
+  link      String?
+  createdAt DateTime         @default(now())
+
+  @@map("notifications")
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ACHIEVEMENT
+  REMINDER
+}
+
+// ============ CERTIFICATES ============
+model Certificate {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  issuedAt    DateTime @default(now())
+  certificateUrl String?
+
+  @@unique([userId, courseId])
+  @@map("certificates")
+}

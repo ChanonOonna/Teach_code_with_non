@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ภาค 1 : HTML Mastery (Detailed Edition)</title>
+    <style>
+        :root { --bg: #0b0f19; --sidebar: #1e293b; --text: #f8fafc; --primary: #2563eb; --warning: #f59e0b; --danger: #ef4444; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:sans-serif; }
+        body { background-color: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+
+        .sidebar { width: 320px; background-color: var(--sidebar); border-right: 1px solid #334155; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 20px; background: #111827; border-bottom: 1px solid #334155; }
+        .sidebar-menu { overflow-y: auto; flex: 1; padding: 10px; }
+        .menu-btn { width: 100%; text-align: left; background: none; border: none; color: #94a3b8; padding: 10px; border-radius: 6px; cursor: pointer; margin-bottom: 5px; font-size: 0.9rem; }
+        .menu-btn.active, .menu-btn:hover { background-color: var(--primary); color: white; }
+
+        .content { flex: 1; overflow-y: auto; padding: 40px; }
+        .lesson-section { display: none; }
+        .lesson-section.active { display: block; }
+        h2 { margin-bottom: 15px; color: #fff; border-left: 5px solid var(--primary); padding-left: 12px; font-size: 1.8rem; }
+        h3 { margin: 20px 0 10px 0; color: #38bdf8; }
+
+        .theory-box { background: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px; line-height: 1.7; border: 1px solid #334155; }
+        .pitfall-box { background: rgba(239,68,68,0.1); border-left: 4px solid var(--danger); padding: 15px; border-radius: 6px; margin: 15px 0; color: #fca5a5; }
+        .pitfall-box strong { color: var(--danger); }
+
+        .quiz-box { background: rgba(37,99,235,0.12); border-left: 4px solid #3b82f6; padding: 15px 20px; border-radius: 6px; margin: 15px 0; }
+        .quiz-box h3 { color: #60a5fa; margin: 0 0 12px 0; }
+        .quiz-item { margin: 10px 0; }
+        .quiz-item p { margin: 0; cursor: pointer; color: #cbd5e1; }
+        .quiz-item p:hover { color: #fff; }
+        .quiz-item .answer { display:none; color: #86efac; padding: 8px 10px; background: rgba(16,185,129,0.1); border-radius: 4px; margin-top: 6px; font-size: 0.9rem; line-height: 1.6; }
+
+        .challenge-box { background: rgba(245,158,11,0.1); border-left: 4px solid var(--warning); padding: 15px 20px; border-radius: 6px; margin: 15px 0; }
+        .challenge-box h3 { color: var(--warning); margin: 0 0 10px 0; }
+        .challenge-box p { color: #fde68a; line-height: 1.7; }
+
+        .tip-box { background: rgba(16,185,129,0.1); border-left: 4px solid #10b981; padding: 15px; border-radius: 6px; margin: 15px 0; color: #6ee7b7; line-height: 1.7; }
+        .tip-box strong { color: #34d399; }
+
+        ul { margin-left: 25px; margin-bottom: 15px; }
+        li { margin-bottom: 5px; }
+        code { background: #0f172a; padding: 2px 6px; border-radius: 4px; color: #f43f5e; font-family: monospace; }
+
+        .sandbox { background: #111827; border: 1px solid #334155; border-radius: 8px; overflow: hidden; margin-top: 20px; }
+        .sandbox-hd { background: #1f2937; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .run-btn { background: #10b981; color: white; border: none; padding: 6px 18px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .sandbox-body { display: grid; grid-template-columns: 1fr 1fr; height: 350px; }
+        textarea { width: 100%; height: 100%; background: #0f172a; color: #34d399; font-family: monospace; padding: 15px; border: none; resize: none; outline: none; font-size: 0.9rem; }
+        iframe { width: 100%; height: 100%; background: white; border: none; }
+        .home-btn { display: inline-block; color: #38bdf8; text-decoration: none; margin-bottom: 10px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>HTML Mastery</h3>
+            <a href="index.html" class="home-btn">← กลับหน้าหลัก</a>
+        </div>
+        <div class="sidebar-menu">
+            <button class="menu-btn active" onclick="openLesson('html1')">บทที่ 1 HTML คืออะไร & ประวัติ</button>
+            <button class="menu-btn" onclick="openLesson('html2')">บทที่ 2 Document Structure</button>
+            <button class="menu-btn" onclick="openLesson('html3')">บทที่ 3 Metadata & SEO Tags</button>
+            <button class="menu-btn" onclick="openLesson('html4')">บทที่ 4 Text Elements เจาะลึก</button>
+            <button class="menu-btn" onclick="openLesson('html5')">บทที่ 5 Lists & Tables</button>
+            <button class="menu-btn" onclick="openLesson('html6')">บทที่ 6-7 Links & Images</button>
+            <button class="menu-btn" onclick="openLesson('html9')">บทที่ 9-11 Forms & Validation</button>
+            <button class="menu-btn" onclick="openLesson('html12')">บทที่ 12-15 Semantics & Multimedia</button>
+            <button class="menu-btn" onclick="openLesson('html16')">บทที่ 16-17 Accessibility & SEO</button>
+        </div>
+    </div>
+
+    <div class="content">
+
+        <!-- บทที่ 1 -->
+        <div id="html1" class="lesson-section active">
+            <h2>บทที่ 1 HTML คืออะไร & ประวัติความเป็นมา</h2>
+            <div class="theory-box">
+                <p><strong>History:</strong> คิดค้นโดย Tim Berners-Lee ในปี 1991 เพื่อใช้แชร์ข้อมูลระหว่างนักวิจัย</p>
+                <p><strong>HTML4:</strong> เน้นการแสดงผลเป็นหลัก แต่โค้ดมักจะกระจัดกระจาย ไร้ระเบียบ</p>
+                <p><strong>XHTML:</strong> นำเอาโครงสร้างไวยากรณ์ที่เข้มงวดของ XML มาครอบทับ ถ้าลืมปิดแท็ก หน้าเว็บจะไม่แสดงผลทันที</p>
+                <p><strong>HTML5:</strong> มาตรฐานปัจจุบันที่ยืดหยุ่น รองรับการเล่นวิดีโอ/เสียงในตัว และแก้ปัญหาโครงสร้างที่ยุ่งยากในอดีต</p>
+                <p><strong>W3C vs WHATWG:</strong> เดิมที W3C คุมกฎเกณฑ์ แต่ทำงานช้า กลุ่มเบราว์เซอร์จึงตั้ง WHATWG ขึ้นมาเพื่อผลักดันมาตรฐาน "Living Standard" (อัปเดตตลอดเวลา) ซึ่งเป็นมาตรฐานหลักที่เราใช้ในปัจจุบัน</p>
+            </div>
+            <div class="pitfall-box">
+                <strong>⚠️ ข้อควรระวัง:</strong> อย่าพยายามมองว่า HTML เป็น Programming Language เพราะมันไม่มี Logic หรือการคำนวณ มันคือ Markup Language เท่านั้น หากเขียนแท็กผิด เบราว์เซอร์จะไม่แจ้ง Error แต่จะพยายามเดาและแสดงผลแบบเพี้ยนๆ แทน
+            </div>
+            <div class="sandbox">
+                <div class="sandbox-hd"><span>ทดลองเขียน HTML แรก</span><button class="run-btn" onclick="runCode('html1')">Run Code</button></div>
+                <div class="sandbox-body">
+                    <textarea id="txt-html1"><h1>สวัสดีโลก!</h1>
+<p>นี่คือหน้าเว็บแรกของฉัน ✨</p>
+<p>HTML ไม่ใช่ภาษาโปรแกรมมิ่ง — มันคือภาษาที่ใช้ <strong>จัดโครงสร้าง</strong> เนื้อหา</p>
+<hr>
+<p><em>ลองแก้ไขโค้ดทางซ้ายแล้วกด Run Code ดูครับ</em></p></textarea>
+                    <iframe id="ifr-html1"></iframe>
+                </div>
+            </div>
+            <div class="quiz-box">
+                <h3>🧠 Quiz — คลิกที่คำถามเพื่อดูคำตอบ</h3>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q1: HTML ย่อมาจากอะไร?</strong></p>
+                    <div class="answer">✅ HyperText Markup Language — "HyperText" หมายถึงข้อความที่มีลิงก์เชื่อมถึงกันได้ "Markup" หมายถึงการใช้แท็กกำกับความหมายของเนื้อหา</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q2: HTML5 เพิ่มความสามารถสำคัญอะไรที่ HTML4 ไม่มี?</strong></p>
+                    <div class="answer">✅ เล่น Video/Audio ในตัวโดยไม่ต้องลง Flash Plugin, รองรับ Semantic tags (<code>&lt;header&gt;</code>, <code>&lt;nav&gt;</code> ฯลฯ), Canvas API, Local Storage, Geolocation</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q3: ถ้าเขียน HTML tag ผิดรูปแบบ จะเกิดอะไรขึ้น?</strong></p>
+                    <div class="answer">✅ เบราว์เซอร์จะไม่แสดง Error แต่จะพยายาม "เดา" และแก้ไขให้ด้วยตัวเอง (Browser Error Recovery) ซึ่งอาจทำให้หน้าเว็บแสดงผลไม่ตรงตามที่ต้องการ</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- บทที่ 2 -->
+        <div id="html2" class="lesson-section">
+            <h2>บทที่ 2 HTML Document Structure</h2>
+            <div class="theory-box">
+                <h3>สิ่งที่จำเป็นต้องรู้ในโครงสร้างหลัก:</h3>
+                <ul>
+                    <li><code>&lt;!DOCTYPE html&gt;</code>: ไม่ใช่แท็ก HTML แต่เป็นคำสั่งบอกเบราว์เซอร์ว่า "นี่คือเอกสาร HTML5"</li>
+                    <li><code>&lt;html lang="th"&gt;</code>: Root tag ที่ครอบทั้งหมด ระบุภาษาช่วย Screen Reader และ SEO</li>
+                    <li><code>&lt;head&gt;</code>: คลังข้อมูลจำเพาะ ห้ามใส่ <code>&lt;h1&gt;</code> หรือ <code>&lt;p&gt;</code> ในนี้เด็ดขาด</li>
+                    <li><code>&lt;body&gt;</code>: รวบรวมทุกมิติข้อมูลที่จะปรากฏแก่สายตาผู้ใช้งาน</li>
+                </ul>
+            </div>
+            <div class="pitfall-box">
+                <strong>⚠️ ข้อควรระวัง:</strong> ลืมเขียน <code>&lt;!DOCTYPE html&gt;</code> จะทำให้เบราว์เซอร์เข้าสู่ <strong>"Quirks Mode"</strong> ซึ่งจะส่งผลให้การคำนวณ Layout ของ CSS เพี้ยนและไม่แสดงผลตามสไตล์โมเดิร์น
+            </div>
+            <div class="sandbox">
+                <div class="sandbox-hd"><span>ทดลองโครงสร้างพื้นฐาน</span><button class="run-btn" onclick="runCode('html2')">Run Code</button></div>
+                <div class="sandbox-body">
+                    <textarea id="txt-html2"><!DOCTYPE html>
+<html lang="th">
+<head>
+    <title>หน้าเว็บที่ถูกต้องตามมาตรฐาน</title>
+</head>
+<body>
+    <h1>โครงสร้างสมบูรณ์แบบ</h1>
+    <p>สไตล์และแท็กเนื้อหาต้องอยู่เฉพาะใน body เท่านั้น</p>
+</body>
+</html></textarea>
+                    <iframe id="ifr-html2"></iframe>
+                </div>
+            </div>
+            <div class="quiz-box">
+                <h3>🧠 Quiz — คลิกที่คำถามเพื่อดูคำตอบ</h3>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q1: ความแตกต่างระหว่าง <code>&lt;head&gt;</code> และ <code>&lt;body&gt;</code> คืออะไร?</strong></p>
+                    <div class="answer">✅ <code>&lt;head&gt;</code> เก็บ metadata ที่ผู้ใช้ไม่เห็น (title, meta, script, link) ส่วน <code>&lt;body&gt;</code> เก็บเนื้อหาที่แสดงบนหน้าจอทั้งหมด</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q2: ทำไมต้องใส่ <code>lang="th"</code> ในแท็ก <code>&lt;html&gt;</code>?</strong></p>
+                    <div class="answer">✅ ช่วย Screen Reader อ่านออกเสียงภาษาได้ถูกต้อง, ช่วย Browser เลือก Font ที่เหมาะสม, และช่วย SEO ให้ Google รู้ว่าเนื้อหาเป็นภาษาไทย</div>
+                </div>
+            </div>
+            <div class="challenge-box">
+                <h3>💪 Challenge</h3>
+                <p>สร้างหน้าเว็บ HTML ที่สมบูรณ์มีหัวข้อ, ย่อหน้า 2 อัน, และ title ที่ถูกต้อง โดยไม่ดูตัวอย่างด้านบน (จำโครงสร้างให้ได้)</p>
+            </div>
+        </div>
+
+        <!-- บทที่ 3 -->
+        <div id="html3" class="lesson-section">
+            <h2>บทที่ 3 Metadata & Tags สำคัญ</h2>
+            <div class="theory-box">
+                <p>แท็ก <code>&lt;meta&gt;</code> ในส่วน <code>&lt;head&gt;</code> มีผลอย่างยิ่งต่อพฤติกรรมของเว็บ:</p>
+                <ul>
+                    <li><code>charset="UTF-8"</code>: จัดการระบบตัวอักษรให้รองรับภาษาไทยและสัญลักษณ์พิเศษทั่วโลก</li>
+                    <li><code>name="viewport" content="width=device-width, initial-scale=1.0"</code>: สั่งให้ขนาดหน้าเว็บยืดหยุ่นตามความกว้างของมือถือ</li>
+                    <li><code>name="description"</code>: ชุดข้อความที่จะไปแสดงบนหน้าค้นหาของ Google (SERP)</li>
+                    <li><code>name="robots" content="noindex"</code>: บอก Google ว่าอย่าเก็บหน้านี้เข้าฐานข้อมูลค้นหา</li>
+                    <li><strong>Open Graph:</strong> <code>property="og:title"</code>, <code>og:image"</code> — ควบคุมหน้าตาเวลา share ลิงก์บน Social Media</li>
+                </ul>
+            </div>
+            <div class="pitfall-box">
+                <strong>⚠️ ข้อควรระวัง:</strong> การลืมใส่ <code>viewport</code> meta tag จะทำให้หน้าเว็บบนมือถือแสดงผลในสเกลย่อส่วนขนาดเท่าหน้าจอเดสก์ท็อป ตัวอักษรจะเล็กมากจนผู้ใช้งานต้องซูม
+            </div>
+            <div class="sandbox">
+                <div class="sandbox-hd"><span>Metadata Structure Demo</span><button class="run-btn" onclick="runCode('html3')">Run Code</button></div>
+                <div class="sandbox-body">
+                    <textarea id="txt-html3"><!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="เว็บสอน HTML สำหรับผู้เริ่มต้น">
+    <meta name="author" content="DevMasteryHub">
+    <!-- Open Graph สำหรับ Social Share -->
+    <meta property="og:title" content="เรียน HTML ฟรี">
+    <meta property="og:description" content="เรียนรู้ HTML จากศูนย์">
+    <title>หน้าตัวอย่าง Metadata</title>
+</head>
+<body>
+    <h1>ดู Inspector ของเบราว์เซอร์</h1>
+    <p>กด F12 → แท็บ Elements เพื่อดู Metadata ในส่วน &lt;head&gt;</p>
+</body>
+</html></textarea>
+                    <iframe id="ifr-html3"></iframe>
+                </div>
+            </div>
+            <div class="quiz-box">
+                <h3>🧠 Quiz — คลิกที่คำถามเพื่อดูคำตอบ</h3>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q1: Open Graph tags ใช้ทำอะไร?</strong></p>
+                    <div class="answer">✅ ควบคุมหน้าตาเวลา Share ลิงก์บน Facebook, LINE, Twitter — กำหนดได้ว่าจะแสดงรูป thumbnail อะไร, หัวข้ออะไร, คำอธิบายอะไร</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q2: <code>meta name="robots" content="noindex"</code> คือคำสั่งอะไร?</strong></p>
+                    <div class="answer">✅ บอก Search Engine ว่า "อย่านำหน้านี้ไปแสดงในผลการค้นหา" มักใช้กับหน้า admin, หน้า staging, หรือหน้าที่ไม่ต้องการให้ public ค้นเจอ</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- บทที่ 4 -->
+        <div id="html4" class="lesson-section">
+            <h2>บทที่ 4 Text Elements เจาะลึกข้อความ</h2>
+            <div class="theory-box">
+                <p>ทำความเข้าใจความต่างระหว่างการเลือกใช้แท็กเพื่อให้เหมาะสมต่อโครงสร้างข้อมูลและ SEO:</p>
+                <ul>
+                    <li><code>&lt;h1&gt;</code> ถึง <code>&lt;h6&gt;</code>: ลำดับหัวข้อ ความสำคัญสูงสุดอยู่ที่ h1</li>
+                    <li><code>&lt;strong&gt;</code> vs <code>&lt;b&gt;</code>: ทั้งคู่แสดงผลตัวหนา แต่ <code>strong</code> สื่อความหมายว่า "สำคัญมาก" ต่อ Search Engine</li>
+                    <li><code>&lt;em&gt;</code> vs <code>&lt;i&gt;</code>: ทั้งคู่แสดงตัวเอียง แต่ <code>em</code> สื่อถึงการเน้นเสียง</li>
+                    <li><code>&lt;mark&gt;</code>: ไฮไลต์ข้อความ (สีเหลือง)</li>
+                    <li><code>&lt;del&gt;</code> / <code>&lt;ins&gt;</code>: แสดงการลบ/เพิ่มข้อมูล (เช่น ราคาเดิม ที่ขีดฆ่า)</li>
+                    <li><code>&lt;sub&gt;</code> / <code>&lt;sup&gt;</code>: ตัวห้อยล่าง / ตัวยกบน (H₂O, x²)</li>
+                    <li><code>&lt;blockquote&gt;</code>: คำพูดอ้างอิง</li>
+                    <li><code>&lt;span&gt;</code>: Inline container ไม่มีความหมาย ใช้จัดสไตล์เฉพาะจุด</li>
+                </ul>
+            </div>
+            <div class="pitfall-box">
+                <strong>⚠️ ข้อควรระวัง:</strong> ใน 1 หน้าเว็บ <strong>ควรมีแท็ก <code>&lt;h1&gt;</code> เพียงแค่อันเดียวเท่านั้น</strong> (ชื่อหัวข้อหลักของหน้า) การใส่หลายอันจะทำลายคะแนน SEO
+            </div>
+            <div class="sandbox">
+                <div class="sandbox-hd"><span>Text Element Sandbox</span><button class="run-btn" onclick="runCode('html4')">Run Code</button></div>
+                <div class="sandbox-body">
+                    <textarea id="txt-html4"><h1>หัวข้อหลักประจำหน้าเว็บ</h1>
+<h2>หัวข้อรอง</h2>
+<p>ย่อหน้าปกติ แต่เลือกสไตล์เฉพาะจุดด้วย <span style="color:red; font-weight:bold;">span ตัวนี้</span></p>
+<p>คำนี้ <strong>สำคัญมาก!</strong> (Strong) ส่วนคำนี้ <em>เน้นเสียงเอียง</em> (Em)</p>
+<p>ราคาปกติ <del>฿1,299</del> ตอนนี้ <mark>ลดเหลือ ฿899</mark> เท่านั้น!</p>
+<p>สูตรเคมี: H<sub>2</sub>O | สมการ: x<sup>2</sup> + y<sup>2</sup> = r<sup>2</sup></p>
+<blockquote style="border-left:3px solid #ccc; padding-left:10px; color:#555;">
+  "การเขียนโค้ดที่ดีคือการเขียนโค้ดที่คนอื่นอ่านแล้วเข้าใจ" — ไม่ทราบผู้พูด
+</blockquote></textarea>
+                    <iframe id="ifr-html4"></iframe>
+                </div>
+            </div>
+            <div class="quiz-box">
+                <h3>🧠 Quiz — คลิกที่คำถามเพื่อดูคำตอบ</h3>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q1: ทำไม <code>&lt;strong&gt;</code> ดีกว่า <code>&lt;b&gt;</code> สำหรับ SEO?</strong></p>
+                    <div class="answer">✅ <code>&lt;strong&gt;</code> มี semantic meaning — บอก Search Engine ว่าข้อความนั้น "มีความสำคัญ" ส่วน <code>&lt;b&gt;</code> เปลี่ยนแค่รูปลักษณ์ภายนอก ไม่มีความหมายเพิ่ม</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q2: <code>&lt;span&gt;</code> ต่างจาก <code>&lt;div&gt;</code> อย่างไร?</strong></p>
+                    <div class="answer">✅ <code>&lt;span&gt;</code> เป็น inline element (ไม่ขึ้นบรรทัดใหม่) ส่วน <code>&lt;div&gt;</code> เป็น block element (กินพื้นที่เต็มบรรทัด ขึ้นบรรทัดใหม่เสมอ)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- บทที่ 5 -->
+        <div id="html5" class="lesson-section">
+            <h2>บทที่ 5 Lists & Tables การจัดการข้อมูลเชิงโครงสร้าง</h2>
+            <div class="theory-box">
+                <p><strong>Lists:</strong></p>
+                <ul>
+                    <li><code>&lt;ul&gt;</code>: Unordered List (จุดนำหน้า ไม่มีลำดับ)</li>
+                    <li><code>&lt;ol&gt;</code>: Ordered List (มีเลขลำดับ)</li>
+                    <li><code>&lt;dl&gt;</code>: Definition List — คู่ <code>&lt;dt&gt;</code> (คำศัพท์) และ <code>&lt;dd&gt;</code> (คำนิยาม)</li>
+                </ul>
+                <p><strong>Tables:</strong> โครงสร้างตารางที่สมบูรณ์ต้องแยกส่วนชัดเจน:</p>
+                <ul>
+                    <li><code>&lt;thead&gt;</code>: ส่วนหัวตาราง</li>
+                    <li><code>&lt;tbody&gt;</code>: ส่วนเนื้อหา</li>
+                    <li><code>&lt;tfoot&gt;</code>: ส่วนสรุปท้ายตาราง</li>
+                    <li><code>colspan / rowspan</code>: รวม cell แนวนอน / แนวตั้ง</li>
+                </ul>
+            </div>
+            <div class="pitfall-box">
+                <strong>⚠️ ข้อควรระวัง:</strong> ภายใน <code>&lt;ul&gt;</code> หรือ <code>&lt;ol&gt;</code> ลูกโดยตรง (Direct Child) ต้องเป็น <code>&lt;li&gt;</code> เท่านั้น ห้ามนำ <code>&lt;div&gt;</code> หรือ <code>&lt;p&gt;</code> ไปใส่ครอบโดยตรง นอกจากนี้ <strong>อย่าใช้ Table สำหรับจัด Layout หน้าเว็บ</strong> — Table มีไว้สำหรับข้อมูลตารางเท่านั้น ใช้ Flexbox/Grid แทน
+            </div>
+            <div class="sandbox">
+                <div class="sandbox-hd"><span>Table & List Demo</span><button class="run-btn" onclick="runCode('html5')">Run Code</button></div>
+                <div class="sandbox-body">
+                    <textarea id="txt-html5"><style>
+  table { width: 100%; border-collapse: collapse; font-family: sans-serif; }
+  th { background: #2563eb; color: white; padding: 8px; }
+  td { border: 1px solid #ccc; padding: 8px; }
+  tfoot td { background: #f1f5f9; font-weight: bold; }
+</style>
+<table>
+  <thead>
+    <tr><th>สินค้า</th><th>จำนวน</th><th>ราคา</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>โน้ตบุ๊ก</td><td>1</td><td>25,000</td></tr>
+    <tr><td>เมาส์ไร้สาย</td><td>2</td><td>900</td></tr>
+  </tbody>
+  <tfoot>
+    <tr><td colspan="2">รวมทั้งหมด</td><td>25,900 บาท</td></tr>
+  </tfoot>
+</table></textarea>
+                    <iframe id="ifr-html5"></iframe>
+                </div>
+            </div>
+            <div class="quiz-box">
+                <h3>🧠 Quiz — คลิกที่คำถามเพื่อดูคำตอบ</h3>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q1: <code>colspan="3"</code> หมายความว่าอะไร?</strong></p>
+                    <div class="answer">✅ Cell นั้นจะขยายกินพื้นที่ 3 คอลัมน์ในแนวนอน มักใช้ใน <code>&lt;tfoot&gt;</code> สำหรับแถวสรุปที่ต้องรวม column เข้าหากัน</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q2: เมื่อไหรควรใช้ <code>&lt;ol&gt;</code> แทน <code>&lt;ul&gt;</code>?</strong></p>
+                    <div class="answer">✅ ใช้ <code>&lt;ol&gt;</code> เมื่อลำดับสำคัญ เช่น ขั้นตอนวิธีทำอาหาร, การ setup โปรแกรม, Ranking ใช้ <code>&lt;ul&gt;</code> เมื่อลำดับไม่สำคัญ เช่น รายการของชำ, รายการเมนู</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- บทที่ 6-7 -->
+        <div id="html6" class="lesson-section">
+            <h2>บทที่ 6-7 Links, Images & Responsive Assets</h2>
+            <div class="theory-box">
+                <p><strong>Links (<code>&lt;a&gt;</code>):</strong></p>
+                <ul>
+                    <li><code>href="#id"</code>: ลิงก์ไปยัง element ในหน้าเดียวกัน (Anchor Link)</li>
+                    <li><code>target="_blank" rel="noopener noreferrer"</code>: เปิดแท็บใหม่ + ปิดช่องโหว่ความปลอดภัย</li>
+                    <li><code>download</code>: บังคับให้ดาวน์โหลดไฟล์แทนการเปิด</li>
+                </ul>
+                <p><strong>Images (<code>&lt;img&gt;</code>):</strong></p>
+                <ul>
+                    <li><code>alt</code>: คำอธิบายรูปภาพ (บังคับสำหรับ Accessibility)</li>
+                    <li><code>loading="lazy"</code>: ชะลอโหลดรูปที่ยังเลื่อนไปไม่ถึง ช่วยเว็บโหลดเร็ว</li>
+                    <li><code>srcset</code>: ระบุรูปหลายขนาด ให้เบราว์เซอร์เลือกตามความละเอียดหน้าจอ</li>
+                </ul>
+                <p><strong>Responsive Images:</strong> ใช้ <code>&lt;picture&gt;</code> + <code>&lt;source&gt;</code> เพื่อเปลี่ยนไฟล์รูปตามขนาดหน้าจอ</p>
+            </div>
+            <div class="pitfall-box">
+                <strong>⚠️ ข้อควรระวัง:</strong> 1. การใช้ <code>target="_blank"</code> ต้องพ่วง <code>rel="noopener noreferrer"</code> เสมอ เพื่อป้องกันการโจมตีแบบ "Reverse Tabnapping" <br>
+                2. ห้ามลืมใส่ <code>alt</code> บนแท็กรูปภาพ หากรูปเป็นของตกแต่งล้วนๆ ให้ใส่ <code>alt=""</code> (ค่าว่าง) เพื่อบอก Screen Reader ว่าข้ามได้
+            </div>
+            <div class="sandbox">
+                <div class="sandbox-hd"><span>Links & Images Demo</span><button class="run-btn" onclick="runCode('html6')">Run Code</button></div>
+                <div class="sandbox-body">
+                    <textarea id="txt-html6"><!-- Link ไปยัง Section เดียวกัน -->
+<a href="#section2">ข้ามไปส่วนที่ 2 ↓</a>
+
+<hr>
+<h3>รูปภาพพร้อม alt และ lazy loading</h3>
+<img src="https://picsum.photos/300/150?random=1"
+     alt="ภาพ placeholder สุ่ม"
+     loading="lazy"
+     style="border-radius:8px; max-width:100%;">
+
+<p id="section2" style="margin-top:20px;">
+  <strong>ส่วนที่ 2:</strong> ลิงก์ด้านบนพาคุณมาที่นี่!
+</p></textarea>
+                    <iframe id="ifr-html6"></iframe>
+                </div>
+            </div>
+            <div class="quiz-box">
+                <h3>🧠 Quiz — คลิกที่คำถามเพื่อดูคำตอบ</h3>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q1: ทำไม <code>loading="lazy"</code> ช่วยให้เว็บเร็วขึ้น?</strong></p>
+                    <div class="answer">✅ เบราว์เซอร์จะโหลดรูปเฉพาะที่อยู่ในหรือใกล้ Viewport เท่านั้น รูปด้านล่างที่ผู้ใช้ยังไม่เลื่อนถึงจะถูกข้ามไปก่อน ทำให้หน้าโหลดเร็วขึ้นและประหยัด bandwidth</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q2: ถ้ารูปภาพเป็นของตกแต่งล้วนๆ ควรใส่ alt อย่างไร?</strong></p>
+                    <div class="answer">✅ ใส่ <code>alt=""</code> (ค่าว่าง) ไม่ใช่ลบ alt ทิ้ง — เพื่อบอก Screen Reader ว่ารูปนี้ไม่มีข้อมูลที่ต้องอ่าน ถ้าลบ alt ทิ้ง Screen Reader จะอ่าน URL ของรูปแทน ซึ่งฟังดูแย่มาก</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- บทที่ 9-11 -->
+        <div id="html9" class="lesson-section">
+            <h2>บทที่ 9-11 Forms, Input Types & Validation</h2>
+            <div class="theory-box">
+                <p>การจัดการแบบฟอร์มเพื่อรวบรวมข้อมูล โดยมี HTML คอยตรวจเช็กความถูกต้องเบื้องต้น (Client-side Validation):</p>
+                <ul>
+                    <li><code>required</code>: บังคับว่าช่องนี้ห้ามเว้นว่าง</li>
+                    <li><code>pattern="[A-Za-z]{3}"</code>: ใช้ Regex จำกัดรูปแบบการกรอก</li>
+                    <li><code>min / max</code>: กำหนดช่วงค่าตัวเลขหรือวันที่</li>
+                    <li><code>minlength / maxlength</code>: จำกัดความยาวข้อความ</li>
+                    <li><code>type="hidden"</code>: อินพุตซ่อนค่า มักใช้ส่ง Token ความปลอดภัย</li>
+                    <li><code>&lt;label for="id"&gt;</code>: เชื่อม label กับ input — คลิก label แล้ว input ได้รับ focus</li>
+                </ul>
+                <p><strong>Input Types สำคัญ:</strong> <code>text</code>, <code>email</code>, <code>password</code>, <code>number</code>, <code>date</code>, <code>file</code>, <code>checkbox</code>, <code>radio</code>, <code>range</code>, <code>color</code></p>
+            </div>
+            <div class="pitfall-box">
+                <strong>⚠️ ข้อควรระวัง:</strong> HTML Validation เป็นเพียงด่านป้องกันขั้นแรกเท่านั้น ผู้ใช้งานที่รู้ไอทีสามารถลบ <code>required</code> ออกได้ง่ายด้วย DevTools ดังนั้นจำเป็นต้องมี <strong>Backend Validation</strong> ที่เซิร์ฟเวอร์ด้วยเสมอ
+            </div>
+            <div class="sandbox">
+                <div class="sandbox-hd"><span>Form Validation Testing</span><button class="run-btn" onclick="runCode('html9')">Run Code</button></div>
+                <div class="sandbox-body">
+                    <textarea id="txt-html9"><style>
+  body { font-family: sans-serif; padding: 15px; }
+  label { display: block; margin-top: 10px; font-weight: bold; }
+  input { padding: 6px; border: 1px solid #ccc; border-radius: 4px; width: 100%; }
+  button { margin-top: 15px; padding: 8px 20px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer; }
+</style>
+<form onsubmit="alert('ผ่านการตรวจสอบ ✅'); return false;">
+  <label for="email">อีเมล:</label>
+  <input type="email" id="email" required placeholder="your@email.com">
+
+  <label for="age">อายุ (18-99):</label>
+  <input type="number" id="age" min="18" max="99" required>
+
+  <label for="code">รหัสพนักงาน (EMP + เลข 3 ตัว):</label>
+  <input type="text" id="code" pattern="EMP[0-9]{3}" required placeholder="EMP101">
+
+  <button type="submit">ส่งข้อมูล</button>
+</form></textarea>
+                    <iframe id="ifr-html9"></iframe>
+                </div>
+            </div>
+            <div class="quiz-box">
+                <h3>🧠 Quiz — คลิกที่คำถามเพื่อดูคำตอบ</h3>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q1: ทำไมต้องใช้ <code>&lt;label for="id"&gt;</code> แทนการพิมพ์ข้อความธรรมดา?</strong></p>
+                    <div class="answer">✅ Label ที่เชื่อมกับ input (ผ่าน for/id) จะทำให้ (1) คลิก label แล้ว input ได้รับ focus, (2) Screen Reader อ่านออกเสียงชื่อ field ให้ผู้พิการทางสายตา, (3) พื้นที่คลิกใหญ่ขึ้นบนมือถือ</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q2: <code>type="email"</code> ต่างจาก <code>type="text"</code> อย่างไร?</strong></p>
+                    <div class="answer">✅ <code>type="email"</code> จะตรวจสอบว่าต้องมี @ และ domain ในรูปแบบที่ถูกต้อง, บนมือถือจะแสดง keyboard ที่มีปุ่ม @ โดยอัตโนมัติ, และ autocomplete แนะนำ email ที่เคยกรอก</div>
+                </div>
+            </div>
+            <div class="challenge-box">
+                <h3>💪 Challenge</h3>
+                <p>สร้างฟอร์มลงทะเบียน มีฟิลด์: ชื่อ (required, minlength 2), อีเมล (email, required), รหัสผ่าน (password, minlength 8), อายุ (number, min 13), และปุ่ม submit</p>
+            </div>
+        </div>
+
+        <!-- บทที่ 12-15 -->
+        <div id="html12" class="lesson-section">
+            <h2>บทที่ 12-15 Semantic HTML, Multimedia & Drawing</h2>
+            <div class="theory-box">
+                <p><strong>Semantic HTML:</strong> เปลี่ยนจากบล็อกไร้ความหมาย (<code>div</code>) มาเป็นแท็กที่ระบุหน้าที่ในตัวเองชัดเจน:</p>
+                <ul>
+                    <li><code>&lt;header&gt;</code>: ส่วนหัว (โลโก้, ชื่อเว็บ)</li>
+                    <li><code>&lt;nav&gt;</code>: เมนูนำทาง</li>
+                    <li><code>&lt;main&gt;</code>: เนื้อหาหลักของหน้า (มีได้แค่อันเดียว)</li>
+                    <li><code>&lt;article&gt;</code>: บทความที่เป็นอิสระ (สามารถนำไปแสดงที่อื่นได้)</li>
+                    <li><code>&lt;section&gt;</code>: กลุ่มเนื้อหาที่เกี่ยวข้อง (ต้องมีหัวข้อ)</li>
+                    <li><code>&lt;aside&gt;</code>: เนื้อหาเสริม (sidebar, โฆษณา)</li>
+                    <li><code>&lt;footer&gt;</code>: ส่วนล่างสุด</li>
+                    <li><code>&lt;figure&gt;</code> + <code>&lt;figcaption&gt;</code>: รูปภาพ + คำบรรยาย</li>
+                </ul>
+                <p><strong>Multimedia:</strong> <code>&lt;video controls&gt;</code> และ <code>&lt;audio controls&gt;</code> เล่นสื่อในตัวโดยไม่ต้องลงโปรแกรมเสริม</p>
+                <p><strong>SVG vs Canvas:</strong> <code>&lt;svg&gt;</code> = Vector (ขยายไม่แตก, DOM-based) เหมาะทำไอคอน ส่วน <code>&lt;canvas&gt;</code> = Pixel (ขับเคลื่อนด้วย JS) เหมาะทำเกม</p>
+            </div>
+            <div class="pitfall-box">
+                <strong>⚠️ ข้อควรระวัง:</strong> อย่าสับสน SVG กับ Canvas! ถ้ามีวัตถุหลายพันชิ้นในหน้าจอ SVG จะช้ามากเพราะเบราว์เซอร์ต้องติดตามทุก element ใน DOM ให้ใช้ Canvas แทนในกรณีนี้ ส่วน <code>&lt;main&gt;</code> ควรมีเพียงอันเดียวต่อหน้าเพื่อ Accessibility
+            </div>
+            <div class="sandbox">
+                <div class="sandbox-hd"><span>Semantic Layout Demo</span><button class="run-btn" onclick="runCode('html12')">Run Code</button></div>
+                <div class="sandbox-body">
+                    <textarea id="txt-html12"><style>
+  * { box-sizing: border-box; font-family: sans-serif; margin: 4px 0; }
+  header { background: #2563eb; color: white; padding: 10px; border-radius: 6px; }
+  nav a { color: white; margin-right: 10px; }
+  main { background: #f0f9ff; padding: 10px; border-radius: 6px; }
+  aside { background: #fef3c7; padding: 10px; border-radius: 6px; font-size: 0.85rem; }
+  footer { background: #1e293b; color: #94a3b8; padding: 8px; border-radius: 6px; font-size: 0.85rem; }
+  figure { margin: 10px 0; }
+</style>
+<header>
+  <strong>🎓 DevMasteryHub</strong>
+  <nav><a href="#">HTML</a><a href="#">CSS</a><a href="#">JS</a></nav>
+</header>
+<main>
+  <article>
+    <h3>บทความ: Semantic HTML คืออะไร</h3>
+    <p>เนื้อหาหลักของบทความ...</p>
+    <figure>
+      <img src="https://picsum.photos/200/80?random=5" alt="ตัวอย่างรูป" style="border-radius:4px;">
+      <figcaption>รูปที่ 1: ตัวอย่าง Semantic Layout</figcaption>
+    </figure>
+  </article>
+</main>
+<aside>📌 บทความยอดนิยม: CSS Flexbox, JavaScript Basics</aside>
+<footer>© 2025 DevMasteryHub — สงวนลิขสิทธิ์</footer></textarea>
+                    <iframe id="ifr-html12"></iframe>
+                </div>
+            </div>
+            <div class="quiz-box">
+                <h3>🧠 Quiz — คลิกที่คำถามเพื่อดูคำตอบ</h3>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q1: <code>&lt;article&gt;</code> ต่างจาก <code>&lt;section&gt;</code> อย่างไร?</strong></p>
+                    <div class="answer">✅ <code>&lt;article&gt;</code> เป็นเนื้อหาที่ยืนได้ด้วยตัวเอง เอาไปแสดงที่อื่นก็เข้าใจได้ (บทความ, โพสต์, รีวิว) ส่วน <code>&lt;section&gt;</code> เป็นกลุ่มเนื้อหาที่เกี่ยวข้องกัน แต่อาจต้องพึ่ง context ของหน้า</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q2: Semantic HTML ช่วย SEO ได้อย่างไร?</strong></p>
+                    <div class="answer">✅ Google's crawler เข้าใจโครงสร้างหน้าเว็บได้ดีขึ้น รู้ว่าส่วนไหนคือ nav, header, main content ทำให้ index เนื้อหาสำคัญได้ถูกต้อง ส่งผลให้อันดับการค้นหาดีขึ้น</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- บทที่ 16-17 -->
+        <div id="html16" class="lesson-section">
+            <h2>บทที่ 16-17 Accessibility (A11y) & SEO Technical</h2>
+            <div class="theory-box">
+                <p><strong>ARIA & Roles:</strong></p>
+                <ul>
+                    <li><code>aria-label="ชื่อปุ่ม"</code>: ตั้งชื่อให้ element สำหรับ Screen Reader</li>
+                    <li><code>aria-hidden="true"</code>: บอก Screen Reader ให้ข้าม element นี้ (ใช้กับไอคอนตกแต่ง)</li>
+                    <li><code>aria-live="polite"</code>: บอกให้ Screen Reader อ่านเมื่อ content เปลี่ยน (ดี loading state)</li>
+                    <li><code>role="button"</code>: ระบุบทบาทของ element (ใช้เฉพาะเมื่อจำเป็นจริงๆ)</li>
+                    <li><strong>Keyboard Navigation:</strong> ทุก interactive element ต้อง focus ด้วย Tab ได้</li>
+                    <li><strong>WCAG 2.1 Level AA:</strong> มาตรฐานสากลที่รัฐบาลและบริษัทใหญ่มักบังคับใช้</li>
+                </ul>
+                <p><strong>SEO Technical:</strong></p>
+                <ul>
+                    <li><code>&lt;title&gt;</code>: 50-60 ตัวอักษร — แสดงบน Browser tab และผลการค้นหา</li>
+                    <li><code>meta description</code>: 150-160 ตัวอักษร — คำอธิบายใต้ชื่อในผลการค้นหา</li>
+                    <li><strong>Schema JSON-LD:</strong> ข้อมูลโครงสร้างที่ฝังใน <code>&lt;script type="application/ld+json"&gt;</code> ช่วยให้ Google แสดง Rich Snippets</li>
+                </ul>
+            </div>
+            <div class="pitfall-box">
+                <strong>⚠️ ข้อควรระวัง:</strong> กฎเหล็กของ A11y — <strong>"No ARIA is better than Bad ARIA"</strong> หมายความว่า <code>&lt;button&gt;</code> ธรรมดาดีกว่า <code>&lt;div role="button"&gt;</code> เพราะ native button จัดการ keyboard, focus, ARIA ให้อัตโนมัติ ส่วน div ต้องทำเองทุกอย่าง
+            </div>
+            <div class="sandbox">
+                <div class="sandbox-hd"><span>Accessible Form Demo</span><button class="run-btn" onclick="runCode('html16')">Run Code</button></div>
+                <div class="sandbox-body">
+                    <textarea id="txt-html16"><style>
+  body { font-family: sans-serif; padding: 15px; }
+  label { display: block; margin-bottom: 4px; font-weight: bold; }
+  input:focus { outline: 3px solid #2563eb; }
+  .error { color: red; font-size: 0.85rem; }
+</style>
+<!-- ✅ Accessible: label, aria, focus visible -->
+<form>
+  <label for="name">ชื่อ-นามสกุล <span aria-hidden="true">*</span></label>
+  <input type="text" id="name" aria-required="true"
+         aria-describedby="name-hint" placeholder="กรอกชื่อของคุณ">
+  <span id="name-hint" class="error">⚠️ กรุณากรอกชื่อ</span>
+
+  <br><br>
+  <!-- ✅ ปุ่มที่มี aria-label ชัดเจน -->
+  <button type="submit" aria-label="ส่งแบบฟอร์มลงทะเบียน">
+    ส่งข้อมูล
+  </button>
+
+  <!-- ❌ ตัวอย่างที่ไม่ดี (comment ไว้ให้ดูเปรียบเทียบ) -->
+  <!-- <div onclick="submit()">ส่ง</div> -->
+</form></textarea>
+                    <iframe id="ifr-html16"></iframe>
+                </div>
+            </div>
+            <div class="quiz-box">
+                <h3>🧠 Quiz — คลิกที่คำถามเพื่อดูคำตอบ</h3>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q1: ทดสอบ Accessibility ของเว็บอย่างไรได้บ้าง?</strong></p>
+                    <div class="answer">✅ (1) ลอง navigate ด้วย Tab key อย่างเดียวโดยไม่ใช้เมาส์ (2) ใช้ Lighthouse ใน Chrome DevTools (3) ติดตั้ง Screen Reader เช่น NVDA (Windows ฟรี) (4) ใช้ extension axe DevTools</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q2: Schema JSON-LD ช่วยอะไรบน Google?</strong></p>
+                    <div class="answer">✅ ทำให้ Google แสดง Rich Snippets เช่น ดาว Rating ในผลการค้นหา, FAQ ที่ขยายได้, Recipe ที่มีรูปและเวลาทำอาหาร — เพิ่ม Click-through Rate ได้มาก</div>
+                </div>
+            </div>
+            <div class="challenge-box">
+                <h3>💪 Final HTML Challenge</h3>
+                <p>สร้างหน้า Blog Post ที่ใช้ Semantic HTML อย่างถูกต้อง: <code>&lt;header&gt;</code> + <code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code> ที่มี <code>&lt;article&gt;</code> (มี <code>&lt;figure&gt;</code> + <code>&lt;figcaption&gt;</code>), <code>&lt;aside&gt;</code> สำหรับบทความแนะนำ, และ <code>&lt;footer&gt;</code> พร้อม metadata ที่ครบถ้วน</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function openLesson(id) {
+            document.querySelectorAll('.lesson-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.currentTarget.classList.add('active');
+            const txtEl = document.getElementById('txt-' + id);
+            if (txtEl) runCode(id);
+        }
+        function runCode(id) {
+            const txt = document.getElementById('txt-' + id);
+            const ifr = document.getElementById('ifr-' + id);
+            if (!txt || !ifr) return;
+            const doc = ifr.contentDocument || ifr.contentWindow.document;
+            doc.open(); doc.write(txt.value); doc.close();
+        }
+        window.onload = function() { runCode('html1'); }
+    </script>
+</body>
+</html>

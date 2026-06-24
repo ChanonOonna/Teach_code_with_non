@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ภาค 3 & 4 : JavaScript Mastery & Deep Core</title>
+    <style>
+        :root { --bg: #0b0f19; --sidebar: #1e293b; --text: #f8fafc; --primary: #eab308; --danger: #ef4444; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:sans-serif; }
+        body { background-color: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+
+        .sidebar { width: 320px; background-color: var(--sidebar); border-right: 1px solid #334155; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 20px; background: #111827; border-bottom: 1px solid #334155; }
+        .sidebar-menu { overflow-y: auto; flex: 1; padding: 10px; }
+        .menu-btn { width: 100%; text-align: left; background: none; border: none; color: #94a3b8; padding: 10px; border-radius: 6px; cursor: pointer; margin-bottom: 5px; font-size: 0.9rem; }
+        .menu-btn.active, .menu-btn:hover { background-color: var(--primary); color: #000; font-weight: bold; }
+
+        .content { flex: 1; overflow-y: auto; padding: 40px; }
+        .lesson-section { display: none; }
+        .lesson-section.active { display: block; }
+        h2 { margin-bottom: 15px; color: #fff; border-left: 5px solid var(--primary); padding-left: 12px; font-size: 1.8rem; }
+        h3 { margin: 20px 0 10px 0; color: #fde047; }
+
+        .theory-box { background: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px; line-height: 1.7; border: 1px solid #334155; }
+        .pitfall-box { background: rgba(239,68,68,0.1); border-left: 4px solid var(--danger); padding: 15px; border-radius: 6px; margin: 15px 0; color: #fca5a5; }
+        .pitfall-box strong { color: var(--danger); }
+
+        .quiz-box { background: rgba(37,99,235,0.12); border-left: 4px solid #3b82f6; padding: 15px 20px; border-radius: 6px; margin: 15px 0; }
+        .quiz-box h3 { color: #60a5fa; margin: 0 0 12px 0; }
+        .quiz-item { margin: 10px 0; }
+        .quiz-item p { margin: 0; cursor: pointer; color: #cbd5e1; }
+        .quiz-item p:hover { color: #fff; }
+        .quiz-item .answer { display:none; color: #86efac; padding: 8px 10px; background: rgba(16,185,129,0.1); border-radius: 4px; margin-top: 6px; font-size: 0.9rem; line-height: 1.6; }
+
+        .challenge-box { background: rgba(234,179,8,0.1); border-left: 4px solid #eab308; padding: 15px 20px; border-radius: 6px; margin: 15px 0; }
+        .challenge-box h3 { color: #fde047; margin: 0 0 10px 0; }
+        .challenge-box p { color: #fde68a; line-height: 1.7; }
+
+        .tip-box { background: rgba(16,185,129,0.1); border-left: 4px solid #10b981; padding: 15px; border-radius: 6px; margin: 15px 0; color: #6ee7b7; line-height: 1.7; }
+        .tip-box strong { color: #34d399; }
+
+        .sandbox { background: #111827; border: 1px solid #334155; border-radius: 8px; overflow: hidden; margin-top: 20px; }
+        .sandbox-hd { background: #1f2937; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .run-btn { background: #10b981; color: white; border: none; padding: 6px 18px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .sandbox-body { display: grid; grid-template-columns: 1fr 1fr; height: 350px; }
+        textarea { width: 100%; height: 100%; background: #0f172a; color: #34d399; font-family: monospace; padding: 15px; border: none; resize: none; outline: none; font-size: 0.9rem; }
+        iframe { width: 100%; height: 100%; background: white; border: none; }
+        ul { margin-left: 25px; margin-bottom: 10px; }
+        li { margin-bottom: 5px; }
+        code { background: #0f172a; padding: 2px 6px; border-radius: 4px; color: #f43f5e; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>JS & Architecture</h3>
+            <a href="index.html" style="color:#38bdf8; text-decoration:none; font-size:0.85rem;">← กลับหน้าหลัก</a>
+        </div>
+        <div class="sidebar-menu">
+            <button class="menu-btn active" onclick="openLesson('js1')">บทที่ 1-7 JS Logic & Scope</button>
+            <button class="menu-btn" onclick="openLesson('js8')">บทที่ 8-9 Object & Arrays Deep</button>
+            <button class="menu-btn" onclick="openLesson('js10')">บทที่ 10-13 DOM & Browser API</button>
+            <button class="menu-btn" onclick="openLesson('js14')">บทที่ 14-16 Async, Fetch & Error</button>
+            <button class="menu-btn" onclick="openLesson('js17')">บทที่ 17-19 Modules, OOP & Functional</button>
+            <button class="menu-btn" onclick="openLesson('js20')">บทที่ 20-22 Event Loop & Memory (Senior)</button>
+            <button class="menu-btn" onclick="openLesson('part4_deep')">ภาค 4: Ecosystem & Tooling</button>
+        </div>
+    </div>
+
+    <div class="content">
+
+        <!-- บทที่ 1-7 -->
+        <div id="js1" class="lesson-section active">
+            <h2>บทที่ 1-7 JavaScript Fundamentals, Operators, Scope & Closures</h2>
+            <div class="theory-box">
+                <p><strong>Operators:</strong> การเปรียบเทียบใน JS มีสองระดับคือ <code>==</code> (ตรวจแค่ค่าข้างในโดยจะพยายามแปลงประเภทข้อมูลให้เท่ากันอัตโนมัติ) และ <code>===</code> (ตรวจสอบเข้มงวด ทั้งประเภทข้อมูลและค่าข้างในต้องเหมือนกันทั้งหมด)</p>
+                <p><strong>Scope (ขอบเขตตัวแปร):</strong> การประกาศตัวแปรด้วย <code>let</code> และ <code>const</code> จะผูกอยู่ภายใต้ขอบเขตบล็อกวงเล็บปีกกา <code>{}</code> (Block Scope) ช่วยป้องกันไม่ให้ค่าตัวแปรหลุดไหลไปกระทบส่วนอื่น</p>
+                <p><strong>Closures (หัวข้อเด่นที่มักถูกถามตอนสัมภาษณ์งาน):</strong> คือความสามารถของฟังก์ชันลูกในการจดจำและเข้าถึงตัวแปรที่อยู่รอบนอกตัวมันได้ แม้ว่าฟังก์ชันตัวแม่จะทำงานจบและถูกเคลียร์ทิ้งไปแล้วก็ตาม</p>
+                <p><strong>Data Types:</strong> JavaScript มี 7 ชนิดข้อมูลพื้นฐาน ได้แก่ <code>string</code>, <code>number</code>, <code>boolean</code>, <code>null</code>, <code>undefined</code>, <code>symbol</code>, <code>bigint</code> และ 1 ชนิดซับซ้อนคือ <code>object</code> (ซึ่งรวม Array และ Function ด้วย)</p>
+            </div>
+            <div class="pitfall-box">
+                <strong>⚠️ ข้อควรระวัง:</strong> หลีกเลี่ยงการใช้คำสั่ง <code>var</code> ในการประกาศตัวแปรยุคนี้โดยเด็ดขาด เนื่องจาก <code>var</code> จะไม่สนใจ Block Scope และจะทำให้เกิดปรากฏการณ์ <strong>"Hoisting"</strong> ซึ่งมักส่งผลให้โปรแกรมทำงานผิดพลาดอย่างหาจุดผิดได้ยาก
+            </div>
+            <div class="sandbox">
+                <div class="sandbox-hd"><span>Scope & Closure Demo</span><button class="run-btn" onclick="runCode('js1')">Run Code</button></div>
+                <div class="sandbox-body">
+                    <textarea id="txt-js1"><script>
+// Closure: ฟังก์ชันลูกจดจำตัวแปรของแม่
+function makeCounter() {
+  let count = 0;
+  return function() {
+    count++;
+    return count;
+  };
+}
+const counter = makeCounter();
+document.write("ครั้งที่ 1: " + counter() + "<br>");
+document.write("ครั้งที่ 2: " + counter() + "<br>");
+document.write("ครั้งที่ 3: " + counter() + "<br>");
+
+// === vs ==
+document.write("<br>5 == '5' → " + (5 == '5') + "<br>");
+document.write("5 === '5' → " + (5 === '5') + "<br>");
+<\/script></textarea>
+                    <iframe id="ifr-js1"></iframe>
+                </div>
+            </div>
+            <div class="quiz-box">
+                <h3>🧠 Quiz — คลิกที่คำถามเพื่อดูคำตอบ</h3>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q1: ผลลัพธ์ของ <code>typeof null</code> คืออะไร?</strong></p>
+                    <div class="answer">✅ <code>"object"</code> — เป็น bug ที่มีมาตั้งแต่ยุคแรกของ JS และไม่แก้เพราะจะทำให้โค้ดเก่าพัง</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q2: <code>let</code> ต่างจาก <code>const</code> อย่างไร?</strong></p>
+                    <div class="answer">✅ <code>let</code> สามารถกำหนดค่าใหม่ได้ภายหลัง ส่วน <code>const</code> กำหนดค่าได้ครั้งเดียว (แต่ถ้าเป็น Object/Array ยังแก้ property ข้างในได้)</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q3: Closure มีประโยชน์ใช้งานจริงอย่างไร?</strong></p>
+                    <div class="answer">✅ ใช้ทำ counter, private state, factory function เช่น Redux store ก็ใช้ Closure ในการซ่อน state ไม่ให้ถูกแก้จากภายนอกโดยตรง</div>
+                </div>
+            </div>
+            <div class="challenge-box">
+                <h3>💪 Challenge</h3>
+                <p>เขียนฟังก์ชัน <code>makeMultiplier(n)</code> ที่รับตัวเลข n แล้วคืนค่าเป็นฟังก์ชันที่คูณเลขด้วย n เช่น <code>makeMultiplier(3)(5)</code> ได้ผล 15 (ใช้แนวคิด Closure)</p>
+            </div>
+        </div>
+
+        <!-- บทที่ 8-9 -->
+        <div id="js8" class="lesson-section">
+            <h2>บทที่ 8-9 Objects & High-Order Array Methods</h2>
+            <div class="theory-box">
+                <p><strong>Objects & 'this':</strong> คีย์เวิร์ด <code>this</code> จะเปลี่ยนค่าแปรผันตาม "วิธีการเรียกใช้ฟังก์ชัน" หากเรียกในฟังก์ชันปกติจะหมายถึงออบเจกต์เจ้าของ แต่หากเรียกใช้ใน <strong>Arrow Function</strong> คีย์เวิร์ด <code>this</code> จะไม่มีเป็นของตัวเอง แต่จะดึงค่า <code>this</code> จากสภาพแวดล้อมที่ครอบอยู่ภายนอกมาใช้</p>
+                <p><strong>High-Order Array Methods:</strong></p>
+                <ul>
+                    <li><code>.map()</code>: วนลูปแปลงข้อมูลและส่งอาเรย์ใหม่ออกมา (ขนาดเท่าเดิม)</li>
+                    <li><code>.filter()</code>: คัดกรองเฉพาะสมาชิกที่ผ่านเงื่อนไข</li>
+                    <li><code>.reduce()</code>: รวบรวมข้อมูลทั้งหมดออกมาเป็นค่าเดียว (เช่น ผลรวม)</li>
+                    <li><code>.find()</code>: ค้นหาสมาชิกตัวแรกที่ตรงเงื่อนไข</li>
+                    <li><code>.some() / .every()</code>: ตรวจสอบว่ามีบางตัว/ทุกตัวที่ผ่านเงื่อนไขหรือไม่</li>
+                </ul>
+            </div>
+            <div class="pitfall-box">
+                <strong>⚠️ ข้อควรระวัง:</strong> เมธอดอย่าง <code>map</code> และ <code>filter</code> จะส่งข้อมูลชุดใหม่ออกมาเสมอโดยไม่ยุ่งกับต้นฉบับ แต่ระวัง! เมธอดอย่าง <code>.sort()</code>, <code>.reverse()</code>, <code>.push()</code>, และ <code>.splice()</code> จะเข้าไปดัดแปลงอาเรย์ต้นฉบับโดยตรง (Mutation)
+            </div>
+            <div class="sandbox">
+                <div class="sandbox-hd"><span>Array Methods Playground</span><button class="run-btn" onclick="runCode('js8')">Run Code</button></div>
+                <div class="sandbox-body">
+                    <textarea id="txt-js8"><script>
+const products = [
+  { name: "โน้ตบุ๊ก", price: 25000 },
+  { name: "เมาส์", price: 450 },
+  { name: "คีย์บอร์ด", price: 1200 },
+  { name: "จอมอนิเตอร์", price: 8500 },
+];
+
+// map: ดึงแค่ชื่อสินค้า
+const names = products.map(p => p.name);
+document.write("ชื่อสินค้า: " + names.join(", ") + "<br>");
+
+// filter: เฉพาะราคาต่ำกว่า 5000
+const affordable = products.filter(p => p.price < 5000);
+document.write("ราคาไม่เกิน 5000: " + affordable.map(p=>p.name).join(", ") + "<br>");
+
+// reduce: คำนวณราคารวม
+const total = products.reduce((sum, p) => sum + p.price, 0);
+document.write("ราคารวม: " + total.toLocaleString() + " บาท");
+<\/script></textarea>
+                    <iframe id="ifr-js8"></iframe>
+                </div>
+            </div>
+            <div class="quiz-box">
+                <h3>🧠 Quiz — คลิกที่คำถามเพื่อดูคำตอบ</h3>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q1: <code>[1,2,3].map(x => x * 2)</code> ได้ผลลัพธ์อะไร?</strong></p>
+                    <div class="answer">✅ <code>[2, 4, 6]</code> — map แปลงทุกตัวและส่งอาเรย์ใหม่ขนาดเท่าเดิม</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q2: ต้องการหาผลรวมของ [10, 20, 30] ควรใช้เมธอดอะไร?</strong></p>
+                    <div class="answer">✅ ใช้ <code>.reduce((sum, n) => sum + n, 0)</code> ได้ผล 60</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q3: Arrow Function ใน Object method มีปัญหาอะไรกับ <code>this</code>?</strong></p>
+                    <div class="answer">✅ Arrow Function ไม่มี <code>this</code> เป็นของตัวเอง จะดึง <code>this</code> จาก scope ภายนอก ทำให้ใน Object method มักได้ค่าผิดหรือเป็น <code>undefined</code></div>
+                </div>
+            </div>
+            <div class="challenge-box">
+                <h3>💪 Challenge</h3>
+                <p>จากอาเรย์ <code>[3, 7, 1, 8, 4, 9, 2]</code> ให้เขียนโค้ดเดียวที่: กรองเฉพาะเลขที่มากกว่า 4 → คูณแต่ละตัวด้วย 10 → หาผลรวม ควรได้ 240</p>
+            </div>
+        </div>
+
+        <!-- บทที่ 10-13 -->
+        <div id="js10" class="lesson-section">
+            <h2>บทที่ 10-13 DOM, Events & Browser Storage</h2>
+            <div class="theory-box">
+                <p><strong>DOM Manipulation:</strong> การเข้าถึงและแก้ไขอิลิเมนต์หน้าเว็บ:</p>
+                <ul>
+                    <li><code>document.querySelector()</code>: เลือก Element แรกที่ตรง CSS Selector</li>
+                    <li><code>element.textContent</code>: อ่าน/เขียนข้อความ (ไม่แปลง HTML)</li>
+                    <li><code>element.innerHTML</code>: อ่าน/เขียนโค้ด HTML (ระวัง XSS)</li>
+                    <li><code>element.addEventListener('click', fn)</code>: ผูก Event Handler</li>
+                </ul>
+                <p><strong>Browser Storage:</strong> <code>localStorage</code> (บันทึกถาวร ไม่หายเมื่อปิดเบราว์เซอร์) และ <code>sessionStorage</code> (ลบเมื่อปิดแท็บ)</p>
+                <p><strong>JSON Processing:</strong> <code>JSON.stringify(obj)</code> แปลง Object → String และ <code>JSON.parse(str)</code> แปลง String → Object</p>
+            </div>
+            <div class="pitfall-box">
+                <strong>⚠️ ข้อควรระวัง:</strong> การดึงข้อมูลจาก <code>localStorage</code> ด้วย <code>JSON.parse()</code> หากข้อมูลเป็น null หรือรูปแบบผิด โปรแกรมจะแครชทันที ต้องครอบด้วย <code>try...catch</code> เสมอ นอกจากนี้ <code>innerHTML</code> อาจทำให้เกิดช่องโหว่ XSS ถ้ารับข้อมูลมาจากผู้ใช้โดยตรง
+            </div>
+            <div class="sandbox">
+                <div class="sandbox-hd"><span>DOM + LocalStorage Demo</span><button class="run-btn" onclick="runCode('js10')">Run Code</button></div>
+                <div class="sandbox-body">
+                    <textarea id="txt-js10"><!DOCTYPE html>
+<html><body style="font-family:sans-serif; padding:20px;">
+<h3>Mini Counter + LocalStorage</h3>
+<p>ค่าจะถูกบันทึก — ลอง Run Code ใหม่แล้วเช็กว่าค่ายังอยู่ไหม</p>
+<button id="btn" onclick="increment()">คลิก!</button>
+<p>นับได้: <strong id="display">0</strong> ครั้ง</p>
+<script>
+  let count = parseInt(localStorage.getItem('demoCount') || '0');
+  document.getElementById('display').textContent = count;
+  function increment() {
+    count++;
+    localStorage.setItem('demoCount', count);
+    document.getElementById('display').textContent = count;
+  }
+<\/script>
+</body></html></textarea>
+                    <iframe id="ifr-js10"></iframe>
+                </div>
+            </div>
+            <div class="quiz-box">
+                <h3>🧠 Quiz — คลิกที่คำถามเพื่อดูคำตอบ</h3>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q1: <code>querySelector</code> ต่างจาก <code>querySelectorAll</code> อย่างไร?</strong></p>
+                    <div class="answer">✅ <code>querySelector</code> คืน Element ตัวแรกที่ตรง (หรือ null) ส่วน <code>querySelectorAll</code> คืน NodeList ของทุกตัวที่ตรง</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q2: ทำไม <code>localStorage.setItem</code> ต้องใช้ <code>JSON.stringify</code> กับ Object?</strong></p>
+                    <div class="answer">✅ LocalStorage เก็บได้แค่ String เท่านั้น ถ้าใส่ Object เข้าไปโดยตรงจะถูกแปลงเป็น <code>"[object Object]"</code> โดยอัตโนมัติ ต้อง stringify ก่อนเสมอ</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q3: Event Bubbling คืออะไร?</strong></p>
+                    <div class="answer">✅ เมื่อ Event เกิดที่ Element ลูก มันจะ "ฟองขึ้น" ผ่านทุก parent จนถึง document ทำให้ parent ก็รับ Event ด้วยถ้ามี listener อยู่ ใช้ <code>e.stopPropagation()</code> เพื่อหยุด</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- บทที่ 14-16 -->
+        <div id="js14" class="lesson-section">
+            <h2>บทที่ 14-16 Async JavaScript, Fetch API & Error Handling</h2>
+            <div class="theory-box">
+                <p><strong>Asynchronous:</strong> การทำงานแบบไม่รอช้า คำสั่งที่ต้องใช้เวลา (เช่น ดึงข้อมูลจาก Server) จะถูกแยกไปทำเบื้องหลัง ไม่ให้หน้าเว็บค้าง</p>
+                <p><strong>Promise:</strong> วัตถุที่แทนค่าผลลัพธ์ในอนาคต มี 3 สถานะ — <code>pending</code>, <code>fulfilled</code>, <code>rejected</code></p>
+                <p><strong>Async / Await:</strong> ไวยากรณ์สมัยใหม่ที่ทำให้เขียนโค้ด async อ่านง่ายเหมือนโค้ดปกติ — ต้องใช้คู่กันเสมอ (<code>await</code> ต้องอยู่ใน <code>async function</code>)</p>
+                <p><strong>Fetch API:</strong> ส่งคำร้องขอ HTTP ผ่าน Methods: <code>GET</code> (ดึงข้อมูล), <code>POST</code> (สร้าง), <code>PUT/PATCH</code> (แก้ไข), <code>DELETE</code> (ลบ)</p>
+            </div>
+            <div class="pitfall-box">
+                <strong>⚠️ ข้อควรระวัง:</strong> <code>fetch()</code> จะ reject (วิ่งเข้า catch) เฉพาะตอนเครือข่ายล้มเหลวเท่านั้น <strong>ถ้า server ตอบ 404 หรือ 500 จะถือว่าสำเร็จ!</strong> ต้องเช็ก <code>if (!response.ok)</code> เพิ่มเติมเสมอ และต้องครอบทั้งหมดด้วย <code>try...catch</code>
+            </div>
+            <div class="sandbox">
+                <div class="sandbox-hd"><span>Async/Await + Fetch Demo</span><button class="run-btn" onclick="runCode('js14')">Run Code</button></div>
+                <div class="sandbox-body">
+                    <textarea id="txt-js14"><!DOCTYPE html>
+<html><body style="font-family:sans-serif; padding:20px;">
+<button onclick="loadData()">ดึงข้อมูล User จาก API</button>
+<div id="result" style="margin-top:15px;"></div>
+<script>
+async function loadData() {
+  const el = document.getElementById('result');
+  el.textContent = 'กำลังโหลด...';
+  try {
+    const res = await fetch('https://jsonplaceholder.typicode.com/users/1');
+    if (!res.ok) throw new Error('HTTP Error: ' + res.status);
+    const user = await res.json();
+    el.innerHTML = `
+      <strong>ชื่อ:</strong> ${user.name}<br>
+      <strong>Email:</strong> ${user.email}<br>
+      <strong>บริษัท:</strong> ${user.company.name}
+    `;
+  } catch(err) {
+    el.style.color = 'red';
+    el.textContent = 'เกิดข้อผิดพลาด: ' + err.message;
+  }
+}
+<\/script>
+</body></html></textarea>
+                    <iframe id="ifr-js14"></iframe>
+                </div>
+            </div>
+            <div class="quiz-box">
+                <h3>🧠 Quiz — คลิกที่คำถามเพื่อดูคำตอบ</h3>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q1: Promise.all([p1, p2, p3]) ทำงานอย่างไร?</strong></p>
+                    <div class="answer">✅ รัน Promise ทุกตัวพร้อมกัน และรอจนทุกตัวสำเร็จ ถ้าตัวใดตัวหนึ่ง reject ทั้งหมดจะ reject ทันที ใช้เมื่อต้องการดึงข้อมูลหลายอย่างพร้อมกันเพื่อประหยัดเวลา</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q2: <code>fetch</code> คืนค่าอะไร และต้องแปลงอย่างไรถึงจะใช้ข้อมูล JSON ได้?</strong></p>
+                    <div class="answer">✅ <code>fetch</code> คืน Promise ของ <code>Response</code> object ต้องเรียก <code>await response.json()</code> อีกครั้งเพื่อแปลงเนื้อหาเป็น JS Object</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q3: ความแตกต่างของ <code>try/catch</code> กับ <code>.catch()</code> คืออะไร?</strong></p>
+                    <div class="answer">✅ ทั้งคู่ทำงานเหมือนกัน แต่ <code>try/catch</code> ใช้กับ async/await ทำให้อ่านง่ายกว่า ส่วน <code>.catch()</code> ใช้กับ Promise chain แบบเดิม</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- บทที่ 17-19 (ใหม่) -->
+        <div id="js17" class="lesson-section">
+            <h2>บทที่ 17-19 Modules, OOP & Functional Programming</h2>
+
+            <h3>บทที่ 17 — ES Modules</h3>
+            <div class="theory-box">
+                <p><strong>Modules คืออะไร:</strong> ระบบแบ่งโค้ดออกเป็นไฟล์ย่อยๆ ที่มีหน้าที่เฉพาะตัว แล้วเรียกใช้งานข้ามไฟล์ได้ ช่วยให้โค้ดจัดระเบียบง่าย ทดสอบได้ และนำกลับมาใช้ซ้ำได้</p>
+                <ul>
+                    <li><code>export</code>: ประกาศส่งออกฟังก์ชัน, ตัวแปร, หรือ Class ออกจากไฟล์</li>
+                    <li><code>export default</code>: ส่งออกค่าหลักหนึ่งค่าต่อไฟล์ (นำเข้าโดยไม่ต้องใช้ <code>{}</code>)</li>
+                    <li><code>import { fn } from './file.js'</code>: นำเข้าแบบเจาะจงชื่อ (Named Import)</li>
+                    <li><code>import * as utils from './file.js'</code>: นำเข้าทั้งหมดและตั้งชื่อกลุ่ม</li>
+                </ul>
+            </div>
+            <div class="pitfall-box">
+                <strong>⚠️ ข้อควรระวัง:</strong> ES Modules ทำงานบน <code>type="module"</code> script tag เท่านั้น และต้องรันผ่าน server (ไม่สามารถเปิดจาก file:// ตรงๆ ได้เพราะ CORS policy) ในโปรเจกต์จริงให้ใช้ Vite หรือ Webpack จัดการ Module Bundling ให้
+            </div>
+            <div class="tip-box">
+                <strong>💡 Pro Tip:</strong> ในโปรเจกต์ใหญ่ ให้จัดโครงสร้าง Module ตาม Feature ไม่ใช่ตาม Type เช่น โฟลเดอร์ <code>auth/</code> มีทั้ง auth.js, authUtils.js, authTypes.js ไว้ด้วยกัน แทนที่จะแยกเป็นโฟลเดอร์ utils/ และ types/
+            </div>
+
+            <h3>บทที่ 18 — OOP (Object-Oriented Programming)</h3>
+            <div class="theory-box">
+                <p><strong>Class:</strong> แม่แบบ (Blueprint) สำหรับสร้างวัตถุ (Object) ที่มีโครงสร้างเหมือนกัน</p>
+                <ul>
+                    <li><code>constructor()</code>: เมธอดพิเศษที่รันทันทีเมื่อสร้าง Object ด้วย <code>new</code></li>
+                    <li><code>extends</code>: การสืบทอด (Inheritance) — คลาสลูกได้รับทุกอย่างจากคลาสแม่</li>
+                    <li><code>super()</code>: เรียกใช้ constructor หรือ method ของคลาสแม่</li>
+                    <li><strong>Encapsulation:</strong> ซ่อนข้อมูลภายใน class ด้วย <code>#privateField</code></li>
+                    <li><strong>Polymorphism:</strong> คลาสลูกสามารถ Override method ของคลาสแม่ให้ทำงานต่างออกไปได้</li>
+                </ul>
+            </div>
+            <div class="sandbox">
+                <div class="sandbox-hd"><span>OOP Class Demo</span><button class="run-btn" onclick="runCode('js17')">Run Code</button></div>
+                <div class="sandbox-body">
+                    <textarea id="txt-js17"><script>
+class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+  speak() {
+    return `${this.name} ส่งเสียง...`;
+  }
+}
+
+class Dog extends Animal {
+  constructor(name, breed) {
+    super(name); // เรียก constructor ของ Animal
+    this.breed = breed;
+  }
+  // Override method (Polymorphism)
+  speak() {
+    return `${this.name} (${this.breed}) เห่า: โฮ่ง โฮ่ง!`;
+  }
+}
+
+class Cat extends Animal {
+  speak() {
+    return `${this.name} ร้อง: เมี้ยว~`;
+  }
+}
+
+const animals = [
+  new Dog("บัดดี้", "ลาบราดอร์"),
+  new Cat("วิสกี้"),
+  new Dog("แม็กซ์", "โกลเดน"),
+];
+
+// Polymorphism: เรียกชื่อเดิม ได้ผลต่างกัน
+animals.forEach(a => document.write(a.speak() + "<br>"));
+<\/script></textarea>
+                    <iframe id="ifr-js17"></iframe>
+                </div>
+            </div>
+
+            <h3>บทที่ 19 — Functional Programming</h3>
+            <div class="theory-box">
+                <p><strong>Pure Function:</strong> ฟังก์ชันที่ (1) ให้ผลลัพธ์เดิมเสมอสำหรับ input เดิม และ (2) ไม่มี Side Effects (ไม่แก้ตัวแปรนอก ไม่เรียก API ไม่เขียน DOM) — ทำให้ทดสอบง่ายมาก</p>
+                <p><strong>Immutability:</strong> ไม่แก้ไขข้อมูลเดิมโดยตรง แต่สร้างข้อมูลใหม่แทน เช่นใช้ <code>spread operator</code> หรือ <code>Object.freeze()</code></p>
+                <p><strong>Higher Order Function (HOF):</strong> ฟังก์ชันที่รับฟังก์ชันอื่นเป็น argument หรือคืนค่าเป็นฟังก์ชัน เช่น <code>.map()</code>, <code>.filter()</code>, <code>.reduce()</code></p>
+                <p><strong>Currying:</strong> เทคนิคแปลงฟังก์ชันที่รับหลาย argument ให้กลายเป็นฟังก์ชันหลายชั้น รับ argument ทีละตัว — ช่วยให้ reuse ได้ง่ายขึ้น</p>
+            </div>
+            <div class="pitfall-box">
+                <strong>⚠️ ข้อควรระวัง:</strong> Functional Programming ไม่ใช่เรื่องของการใช้ arrow function ทุกที่ แต่คือ "วิธีคิด" — หลีกเลี่ยงการ Mutate State และแยก Side Effects ออกจาก Business Logic ให้ชัดเจน
+            </div>
+            <div class="quiz-box">
+                <h3>🧠 Quiz — คลิกที่คำถามเพื่อดูคำตอบ</h3>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q1: ฟังก์ชันนี้เป็น Pure Function ไหม? <code>function add(a,b){ return a+b; }</code></strong></p>
+                    <div class="answer">✅ ใช่ — ให้ผลเดิมเสมอสำหรับ input เดิม และไม่มี Side Effects</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q2: <code>export default</code> ต่างจาก <code>export</code> แบบปกติอย่างไร?</strong></p>
+                    <div class="answer">✅ <code>export default</code> มีได้แค่อันเดียวต่อไฟล์ ตอนนำเข้าไม่ต้องใช้ <code>{}</code> และตั้งชื่อใหม่ได้เลย ส่วน Named Export มีได้หลายอัน แต่ต้องใช้ <code>{}</code> และชื่อต้องตรง</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q3: Currying ช่วยอะไรในชีวิตจริง?</strong></p>
+                    <div class="answer">✅ ช่วย reuse logic ได้ง่าย เช่น <code>const addTax = add(0.07)</code> แล้วเรียกใช้ <code>addTax(price)</code> ซ้ำหลายครั้ง แทนที่จะต้องส่ง tax rate ทุกครั้ง ใช้มากใน React, Redux, และ library อย่าง Ramda</div>
+                </div>
+            </div>
+            <div class="challenge-box">
+                <h3>💪 Challenge</h3>
+                <p>สร้าง class <code>BankAccount</code> ที่มี private field <code>#balance</code>, method <code>deposit(amount)</code>, <code>withdraw(amount)</code>, และ <code>getBalance()</code> โดย withdraw ต้องตรวจสอบว่ายอดเงินพอไหมก่อน</p>
+            </div>
+        </div>
+
+        <!-- บทที่ 20-22 -->
+        <div id="js20" class="lesson-section">
+            <h2>บทที่ 20-22 Event Loop & Memory Management (Senior Spec)</h2>
+            <div class="theory-box">
+                <h3>กลไกเชิงลึกของภาษา JavaScript (Single-Threaded Runtime):</h3>
+                <p>เนื่องจากเครื่องยนต์ JS ประมวลผลโค้ดได้ทีละคำสั่ง มันจึงใช้ระบบสลับงานอย่างแยบยล:</p>
+                <ul>
+                    <li><strong>Call Stack:</strong> ประมวลผลโค้ดทั่วไปแบบเข้าทีหลังออกก่อน (LIFO)</li>
+                    <li><strong>Microtask Queue:</strong> แถวคิวพิเศษระดับสูงสุดของ <code>.then()</code> และ <code>async/await</code> — รันก่อน Macrotask เสมอ</li>
+                    <li><strong>Macrotask / Callback Queue:</strong> แถวงานทั่วไป เช่น <code>setTimeout</code>, <code>setInterval</code>, DOM Events</li>
+                    <li><strong>กฎเหล็ก:</strong> Event Loop จะดึงงานจาก Microtask Queue ให้หมดก่อน แล้วค่อยดึง Macrotask มาทำทีละอัน</li>
+                </ul>
+                <p><strong>Memory Layout:</strong> ตัวแปร primitive อยู่ใน <code>Stack</code> (เร็ว) ส่วน Object/Array อยู่ใน <code>Heap</code> (ยืดหยุ่น) พร้อมระบบ <strong>Garbage Collection</strong> ที่คอยเก็บกวาดหน่วยความจำที่ไม่มีใครอ้างอิงอีกต่อไป</p>
+            </div>
+            <div class="pitfall-box">
+                <strong>⚠️ ข้อควรระวังระดับสูง:</strong> การผูก Event Listener ไว้กับ window หรือตั้ง <code>setInterval</code> ทิ้งไว้โดยไม่เคยล้างด้วย <code>removeEventListener</code> หรือ <code>clearInterval</code> จะทำให้เกิด <strong>Memory Leak</strong> — Object จะค้างอยู่ใน Heap ตลอดไปจนระบบช้าลง
+            </div>
+            <div class="sandbox">
+                <div class="sandbox-hd"><span>Event Loop Order Demo</span><button class="run-btn" onclick="runCode('js20')">Run Code</button></div>
+                <div class="sandbox-body">
+                    <textarea id="txt-js20"><script>
+const log = msg => document.write(msg + "<br>");
+
+log("1️⃣ เริ่ม (Synchronous)");
+
+setTimeout(() => log("4️⃣ setTimeout (Macrotask)"), 0);
+
+Promise.resolve()
+  .then(() => log("3️⃣ Promise.then (Microtask)"))
+  .then(() => log("   └─ Microtask ที่ 2"));
+
+log("2️⃣ จบ (Synchronous)");
+
+// ลำดับที่ได้: 1 → 2 → 3 → Microtask 2 → 4
+// ทั้งที่ setTimeout เป็น 0ms แต่ Microtask รันก่อนเสมอ!
+<\/script></textarea>
+                    <iframe id="ifr-js20"></iframe>
+                </div>
+            </div>
+            <div class="quiz-box">
+                <h3>🧠 Quiz — คลิกที่คำถามเพื่อดูคำตอบ</h3>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q1: ถ้า Call Stack ไม่ว่าง Event Loop จะทำงานไหม?</strong></p>
+                    <div class="answer">✅ ไม่ — Event Loop จะรอจนกว่า Call Stack ว่างเปล่าก่อน แล้วค่อยดึงงานจาก Queue มา ทำให้ถ้า Synchronous code ทำงานนานมากหน้าเว็บจะค้าง (ไม่ตอบสนอง)</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q2: ทำไม <code>async/await</code> ถึงใช้ Microtask Queue?</strong></p>
+                    <div class="answer">✅ เพราะ <code>await</code> ถูก compile เป็น <code>.then()</code> โดย JS Engine ทำให้ code หลัง await วิ่งใน Microtask Queue ซึ่งมี priority สูงกว่า setTimeout</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ภาค 4 -->
+        <div id="part4_deep" class="lesson-section">
+            <h2>ภาค 4 : สิ่งที่ Developer ต้องรู้ต่อในสายงานฟูลสแต็ก</h2>
+            <div class="theory-box">
+                <h3>สรุปนิเวศเทคโนโลยียุคปัจจุบัน:</h3>
+                <ul>
+                    <li><strong>Git (Version Control):</strong> <code>rebase</code> ใช้จัดลำดับประวัติการเซฟโค้ดให้เป็นเส้นตรงสวยงาม ต่างจาก <code>merge</code> ที่รวมสายประวัติโค้ดทั้งหมดเข้ามาชนกัน</li>
+                    <li><strong>Package Manager:</strong> แนะนำ <code>pnpm</code> แทน npm เพราะใช้ Hard Links ประหยัดพื้นที่ฮาร์ดดิสก์และเร็วกว่า</li>
+                    <li><strong>TypeScript:</strong> JavaScript + ระบบ Type ช่วยจับข้อผิดพลาดตั้งแต่เขียนโค้ด ไม่ต้องรอให้ runtime crash</li>
+                    <li><strong>Next.js Render Modes:</strong> <code>SSR</code> (เรนเดอร์สดจากเซิร์ฟเวอร์ทุกครั้ง), <code>SSG</code> (คอมไพล์ตั้งแต่ build time โหลดเร็วสุด), <code>ISR</code> (อัปเดตหน้า SSG ตามเวลาที่กำหนด)</li>
+                    <li><strong>Docker:</strong> ห่อโปรแกรมพร้อม environment ไว้ใน Container ทำให้ "ทำงานบนเครื่องฉันได้" กลายเป็น "ทำงานได้ทุกเครื่อง"</li>
+                </ul>
+            </div>
+            <div class="tip-box">
+                <strong>💡 แนวทางการเรียนต่อ:</strong> หลังจากเชี่ยวชาญ JS แล้ว เส้นทางที่แนะนำคือ TypeScript → React → Next.js → Node.js/Express → Database (PostgreSQL หรือ MongoDB) → Docker → Cloud (AWS/GCP/Vercel) ในแต่ละขั้นให้สร้าง project จริงเก็บไว้ใน GitHub เพื่อใช้ในการสมัครงาน
+            </div>
+            <div class="challenge-box">
+                <h3>🎯 Final Challenge — Portfolio Project</h3>
+                <p>สร้าง <strong>Weather App</strong> โดยใช้ความรู้ทุกอย่างที่เรียนมา: fetch ข้อมูลจาก OpenWeatherMap API, แสดงผลด้วย DOM manipulation, บันทึก history ใน localStorage, และ handle error อย่างสมบูรณ์</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function openLesson(id) {
+            document.querySelectorAll('.lesson-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.currentTarget.classList.add('active');
+            const txtEl = document.getElementById('txt-' + id);
+            if (txtEl) runCode(id);
+        }
+        function runCode(id) {
+            const txt = document.getElementById('txt-' + id);
+            const ifr = document.getElementById('ifr-' + id);
+            if (!txt || !ifr) return;
+            const doc = ifr.contentDocument || ifr.contentWindow.document;
+            doc.open(); doc.write(txt.value); doc.close();
+        }
+        window.onload = function() {
+            const txt = document.getElementById('txt-js1');
+            if (txt) runCode('js1');
+        }
+    </script>
+</body>
+</html>

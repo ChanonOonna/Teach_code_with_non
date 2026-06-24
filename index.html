@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevMasteryHub - The Ultimate Learning Platform</title>
+    <style>
+        :root { --bg: #0f172a; --card: #1e293b; --primary: #2563eb; --accent: #38bdf8; --text: #f8fafc; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:sans-serif; }
+        body { background-color: var(--bg); color: var(--text); padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; text-align: center; }
+        h1 { font-size: 2.5rem; margin-bottom: 10px; color: #fff; }
+        p.subtitle { color: var(--accent); margin-bottom: 40px; }
+        
+        /* Grid เลือกภาคเรียน */
+        .grid-modules { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-bottom: 60px; }
+        .card { background-color: var(--card); border: 1px solid #334155; padding: 30px; border-radius: 12px; text-align: left; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .card h2 { color: #fff; margin-bottom: 15px; }
+        .card p { color: #94a3b8; font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px; }
+        .btn { display: inline-block; background-color: var(--primary); color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; }
+        
+        /* Roadmap Section */
+        .roadmap { background-color: var(--card); padding: 40px; border-radius: 12px; border: 1px solid #334155; }
+        .roadmap h2 { margin-bottom: 30px; }
+        .step-list { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .step { background: #111827; border-left: 4px solid var(--accent); padding: 12px 30px; width: 100%; max-width: 500px; text-align: left; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 DevMasteryHub</h1>
+        <p class="subtitle">ระบบการเรียนรู้เพื่อก้าวสู่การเป็น Full-Stack Developer ระดับมืออาชีพ</p>
+        
+        <div class="grid-modules">
+            <div class="card">
+                <h2>ภาค 1 : HTML Mastery</h2>
+                <p>เรียนรู้โครงสร้างเว็บตั้งแต่ยุคเริ่มต้น ประวัติศาสตร์ โครงสร้างเอกสาร เอกสารรูปแบบ Semantic และการทำแบบฟอร์มขั้นสูง</p>
+                <a href="html-mastery.html" class="btn">เข้าสู่บทเรียน →</a>
+            </div>
+            <div class="card">
+                <h2>ภาค 2 : CSS Mastery</h2>
+                <p>ตกแต่งหน้าเว็บให้สวยงามด้วย Box Model, Flexbox, Grid Layout ตลอดจนการทำแอนิเมชัน และฟังก์ชันคำนวณยุคใหม่</p>
+                <a href="css-mastery.html" class="btn">เข้าสู่บทเรียน →</a>
+            </div>
+            <div class="card">
+                <h2>ภาค 3 & 4 : JS & Ecosystem</h2>
+                <p>เจาะลึก Logic การเขียนโปรแกรม ข้อมูลประเภท Array เมธอดระดับสูง โครงสร้างระดับ Senior อย่าง Event Loop และอนาคตที่ต้องรู้</p>
+                <a href="js-mastery.html" class="btn">เข้าสู่บทเรียน →</a>
+            </div>
+        </div>
+
+        <div class="roadmap">
+            <h2>🏁 Roadmap สรุปเส้นทางการเดินสาย Developer</h2>
+            <div class="step-list">
+                <div class="step">1. Internet & Browser System</div>
+                <div class="step">2. HTML5 & Semantic Web Elements</div>
+                <div class="step">3. CSS3 Layouts (Flexbox / Grid) & Responsive Design</div>
+                <div class="step">4. JavaScript Basics & DOM Manipulation</div>
+                <div class="step">5. Modern JS (ES6+, Async/Await, Fetch API)</div>
+                <div class="step">6. Git Version Control & TypeScript</div>
+                <div class="step">7. Frontend Frameworks (React & Next.js)</div>
+                <div class="step">8. Backend (Node.js, Databases, Auth, Docker)</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

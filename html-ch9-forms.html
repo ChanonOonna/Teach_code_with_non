@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>บทที่ 9-11 Forms & Validations</title>
+    <style>
+        body { background: #0b0f19; color: #e2e8f0; font-family: sans-serif; padding: 40px; }
+        .back-link { color: #38bdf8; text-decoration: none; font-weight: bold; display: inline-block; margin-bottom: 20px; }
+        h1 { color: #fff; margin-bottom: 10px; }
+        p.desc { color: #94a3b8; margin-bottom: 30px; }
+        .sandbox { background: #111827; border: 1px solid #334155; border-radius: 12px; overflow: hidden; display: grid; grid-template-columns: 1fr 1fr; height: 420px; }
+        textarea { width: 100%; height: 100%; background: #0f172a; color: #34d399; font-family: monospace; padding: 15px; border: none; resize: none; outline: none; }
+        .preview-side { background: #ffffff; padding: 20px; }
+        iframe { width: 100%; height: 100%; border: none; background: white; }
+        .control-bar { background: #1f2937; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 12px 12px 0 0; border: 1px solid #334155; border-bottom: none; }
+        .btn-run { background: #10b981; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-link">← กลับหน้าสารบัญหลัก</a>
+    <h1>บทที่ 9, 10, 11: Forms, Input Types & Validation</h1>
+    <p class="desc">เรียนรู้คุณสมบัติของฟอร์ม และข้อจำกัด (Attributes) ในการควบคุมความปลอดภัยของข้อมูลเบื้องต้น</p>
+
+    <div class="control-bar">
+        <span style="color: #94a3b8; font-size: 0.9rem;">ลองทดสอบกดปุ่ม Submit เพื่อดูการทำระบบตรวจจับคำผิด (Required/Pattern)</span>
+        <button class="btn-run" onclick="updateFormPreview()">อัปเดตฟอร์ม</button>
+    </div>
+    <div class="sandbox">
+        <textarea id="form-code-area"><form onsubmit="alert('ผ่านการตรวจสอบ! ข้อมูลถูกส่งเข้าเซิร์ฟเวอร์จำลองเรียบร้อย'); return false;" style="font-family: sans-serif; color: #333;">
+  <fieldset style="border: 2px solid #2563eb; padding: 15px; border-radius: 8px;">
+    <legend style="font-weight: bold; color: #2563eb; padding: 0 5px;">แบบฟอร์มลงทะเบียนระดับ Advance</legend>
+    
+    <label>ชื่อผู้ใช้งาน (ห้ามต่ำกว่า 4 ตัวอักษร):</label><br>
+    <input type="text" minlength="4" maxlength="15" required style="width:100%; padding:5px; margin:5px 0;"><br>
+
+    <label>รหัสผ่าน (ต้องเป็นตัวเลขเท่านั้น 6 หลักด้วย Regex):</label><br>
+    <input type="password" pattern="[0-9]{6}" title="กรุณากรอกเฉพาะตัวเลข 6 ตัวเท่านั้น" required style="width:100%; padding:5px; margin:5px 0;"><br>
+
+    <label>วันที่ต้องการเริ่มเรียน (Date Type):</label><br>
+    <input type="date" min="2026-01-01" max="2026-12-31" style="padding:5px; margin:5px 0;"><br>
+
+    <label>เลือกโทนสีประจำตัวของคุณ (Color Type):</label><br>
+    <input type="color" style="margin:5px 0;"><br><br>
+
+    <button type="submit" style="background:#2563eb; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer;">ส่งข้อมูลใบสมัคร</button>
+  </fieldset>
+</form></textarea>
+        <div class="preview-side">
+            <iframe id="form-live-iframe"></iframe>
+        </div>
+    </div>
+
+    <script>
+        function updateFormPreview() {
+            const code = document.getElementById('form-code-area').value;
+            const iframe = document.getElementById('form-live-iframe');
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            doc.open(); doc.write(code); doc.close();
+        }
+        window.onload = updateFormPreview;
+    </script>
+</body>
+</html>

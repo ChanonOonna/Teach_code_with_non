@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ภาค 2 : CSS Mastery (Detailed Edition)</title>
+    <style>
+        :root { --bg: #0b0f19; --sidebar: #1e293b; --text: #f8fafc; --primary: #ec4899; --danger: #ef4444; --warning: #f59e0b; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:sans-serif; }
+        body { background-color: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+
+        .sidebar { width: 320px; background-color: var(--sidebar); border-right: 1px solid #334155; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 20px; background: #111827; border-bottom: 1px solid #334155; }
+        .sidebar-menu { overflow-y: auto; flex: 1; padding: 10px; }
+        .menu-btn { width: 100%; text-align: left; background: none; border: none; color: #94a3b8; padding: 10px; border-radius: 6px; cursor: pointer; margin-bottom: 5px; font-size: 0.9rem; }
+        .menu-btn.active, .menu-btn:hover { background-color: var(--primary); color: white; }
+
+        .content { flex: 1; overflow-y: auto; padding: 40px; }
+        .lesson-section { display: none; }
+        .lesson-section.active { display: block; }
+        h2 { margin-bottom: 15px; color: #fff; border-left: 5px solid var(--primary); padding-left: 12px; font-size: 1.8rem; }
+        h3 { margin: 20px 0 10px 0; color: #f472b6; }
+
+        .theory-box { background: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px; line-height: 1.7; border: 1px solid #334155; }
+        .pitfall-box { background: rgba(239,68,68,0.1); border-left: 4px solid var(--danger); padding: 15px; border-radius: 6px; margin: 15px 0; color: #fca5a5; }
+        .pitfall-box strong { color: var(--danger); }
+
+        .quiz-box { background: rgba(236,72,153,0.1); border-left: 4px solid #ec4899; padding: 15px 20px; border-radius: 6px; margin: 15px 0; }
+        .quiz-box h3 { color: #f9a8d4; margin: 0 0 12px 0; }
+        .quiz-item { margin: 10px 0; }
+        .quiz-item p { margin: 0; cursor: pointer; color: #cbd5e1; }
+        .quiz-item p:hover { color: #fff; }
+        .quiz-item .answer { display:none; color: #86efac; padding: 8px 10px; background: rgba(16,185,129,0.1); border-radius: 4px; margin-top: 6px; font-size: 0.9rem; line-height: 1.6; }
+
+        .challenge-box { background: rgba(245,158,11,0.1); border-left: 4px solid var(--warning); padding: 15px 20px; border-radius: 6px; margin: 15px 0; }
+        .challenge-box h3 { color: var(--warning); margin: 0 0 10px 0; }
+        .challenge-box p { color: #fde68a; line-height: 1.7; }
+
+        .tip-box { background: rgba(16,185,129,0.1); border-left: 4px solid #10b981; padding: 15px; border-radius: 6px; margin: 15px 0; color: #6ee7b7; line-height: 1.7; }
+        .tip-box strong { color: #34d399; }
+
+        .sandbox { background: #111827; border: 1px solid #334155; border-radius: 8px; overflow: hidden; margin-top: 20px; }
+        .sandbox-hd { background: #1f2937; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .run-btn { background: #10b981; color: white; border: none; padding: 6px 18px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .sandbox-body { display: grid; grid-template-columns: 1fr 1fr; height: 350px; }
+        textarea { width: 100%; height: 100%; background: #0f172a; color: #34d399; font-family: monospace; padding: 15px; border: none; resize: none; outline: none; font-size: 0.9rem; }
+        iframe { width: 100%; height: 100%; background: white; border: none; }
+        ul { margin-left: 25px; margin-bottom: 10px; }
+        li { margin-bottom: 5px; }
+        code { background: #0f172a; padding: 2px 6px; border-radius: 4px; color: #f43f5e; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>CSS Mastery</h3>
+            <a href="index.html" style="color:#38bdf8; text-decoration:none; font-size:0.85rem;">← กลับหน้าหลัก</a>
+        </div>
+        <div class="sidebar-menu">
+            <button class="menu-btn active" onclick="openLesson('css1')">บทที่ 1-5 Selectors, Units & Color</button>
+            <button class="menu-btn" onclick="openLesson('css6')">บทที่ 6-8 Box Model & Position</button>
+            <button class="menu-btn" onclick="openLesson('css9')">บทที่ 9-11 Flexbox, Grid & Responsive</button>
+            <button class="menu-btn" onclick="openLesson('css12')">บทที่ 12-14 Animation & Transform</button>
+            <button class="menu-btn" onclick="openLesson('css15')">บทที่ 15-17 Pseudo & Variables</button>
+            <button class="menu-btn" onclick="openLesson('css18')">บทที่ 18-19 Modern CSS Architecture</button>
+        </div>
+    </div>
+
+    <div class="content">
+
+        <!-- บทที่ 1-5 -->
+        <div id="css1" class="lesson-section active">
+            <h2>บทที่ 1-5 CSS Fundamentals, Selectors, Units & Colors</h2>
+            <div class="theory-box">
+                <p><strong>Cascade & Specificity (คะแนนความสำคัญ):</strong></p>
+                <ul>
+                    <li>แท็กทั่วไป <code>p</code> = 1 คะแนน</li>
+                    <li>Class <code>.btn</code> = 10 คะแนน</li>
+                    <li>ID <code>#header</code> = 100 คะแนน</li>
+                    <li>Inline style <code>style="..."</code> = 1000 คะแนน</li>
+                    <li><code>!important</code> = ชนะทุกอย่าง (แต่ห้ามใช้พร่ำเพรื่อ)</li>
+                </ul>
+                <p><strong>Units (หน่วยวัด):</strong></p>
+                <ul>
+                    <li><code>px</code>: พิกเซลตายตัว — ไม่ขยายตามการตั้งค่า font ผู้ใช้</li>
+                    <li><code>rem</code>: ขยายตาม root font-size (16px ปกติ) — ดีสำหรับ Accessibility</li>
+                    <li><code>em</code>: ขยายตาม font-size ของ parent — ใช้สำหรับ spacing ที่ scale ตาม text</li>
+                    <li><code>vw / vh</code>: เปอร์เซ็นต์ตามความกว้าง/สูงของ viewport</li>
+                    <li><code>%</code>: เปอร์เซ็นต์ตาม parent element</li>
+                </ul>
+                <p><strong>Colors:</strong> <code>hex</code> (#ffffff), <code>rgb()</code>, <code>rgba()</code> (มีความโปร่งใส alpha), <code>hsl()</code> (Hue, Saturation, Lightness — เหมาะสร้าง color system)</p>
+            </div>
+            <div class="pitfall-box">
+                <strong>⚠️ ข้อควรระวัง:</strong> หลีกเลี่ยง <code>!important</code> — มันทำลายระบบ Specificity และทำให้โค้ดแก้ไขได้ยากมากในอนาคต ถ้าต้องใช้ <code>!important</code> แปลว่าโครงสร้าง CSS มีปัญหาอยู่ก่อนแล้ว
+            </div>
+            <div class="sandbox">
+                <div class="sandbox-hd"><span>Specificity Sandbox</span><button class="run-btn" onclick="runCode('css1')">Run Code</button></div>
+                <div class="sandbox-body">
+                    <textarea id="txt-css1"><style>
+  /* 1 คะแนน */
+  p { color: blue; }
+
+  /* 10 คะแนน — ชนะ */
+  .text-orange { color: orange; }
+
+  /* 100 คะแนน — ชนะทุกอย่าง */
+  #winner { color: green; font-weight: bold; }
+
+  /* ทดสอบ hsl color */
+  .hsl-demo {
+    background: hsl(210, 100%, 95%);
+    border: 2px solid hsl(210, 100%, 50%);
+    padding: 8px;
+    border-radius: 6px;
+    color: hsl(210, 100%, 30%);
+    margin-top: 10px;
+  }
+</style>
+
+<p class="text-orange">สีนี้คือ? (p=1 vs .class=10)</p>
+<p class="text-orange" id="winner">สีนี้คือ? (10 vs #id=100)</p>
+
+<div class="hsl-demo">
+  HSL Color: hsl(210, 100%, 50%) — ง่ายต่อการสร้าง Color System
+</div></textarea>
+                    <iframe id="ifr-css1"></iframe>
+                </div>
+            </div>
+            <div class="quiz-box">
+                <h3>🧠 Quiz — คลิกที่คำถามเพื่อดูคำตอบ</h3>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q1: <code>#id p.active</code> มีคะแนน Specificity เท่าไหร่?</strong></p>
+                    <div class="answer">✅ 111 คะแนน — #id (100) + p (1) + .active (10) = 111</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q2: ทำไม <code>rem</code> ดีกว่า <code>px</code> สำหรับ font-size?</strong></p>
+                    <div class="answer">✅ <code>rem</code> ขยายตาม root font-size ของเบราว์เซอร์ ทำให้ผู้ใช้ที่ตั้งค่าตัวอักษรใหญ่ขึ้น (เพราะสายตาไม่ดี) ยังใช้เว็บได้ ส่วน <code>px</code> ตายตัวไม่สนใจ setting ผู้ใช้</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q3: <code>rgba(0, 0, 0, 0.5)</code> หมายถึงสีอะไร?</strong></p>
+                    <div class="answer">✅ สีดำ (0,0,0) ที่โปร่งแสง 50% — ค่า alpha 0=โปร่งใสสมบูรณ์, 1=ทึบสมบูรณ์</div>
+                </div>
+            </div>
+            <div class="challenge-box">
+                <h3>💪 Challenge</h3>
+                <p>สร้าง Color Palette โดยใช้ HSL — เขียน CSS 5 สี ที่มี Hue เดิม (210) แต่เปลี่ยน Lightness จาก 20% ถึง 90% เพื่อสร้าง shade ของสีฟ้า</p>
+            </div>
+        </div>
+
+        <!-- บทที่ 6-8 -->
+        <div id="css6" class="lesson-section">
+            <h2>บทที่ 6-8 Box Model, Display & Position</h2>
+            <div class="theory-box">
+                <p><strong>Box Model:</strong> ทุก element คือกล่องสี่เหลี่ยม ประกอบด้วย (จากในสุดออกนอก): Content → Padding → Border → Margin</p>
+                <p><strong>Display values สำคัญ:</strong></p>
+                <ul>
+                    <li><code>block</code>: กินพื้นที่เต็มบรรทัด ขึ้นบรรทัดใหม่เสมอ (<code>div</code>, <code>p</code>, <code>h1</code>)</li>
+                    <li><code>inline</code>: เรียงแนวนอน ปรับ width/height ไม่ได้ (<code>span</code>, <code>a</code>, <code>strong</code>)</li>
+                    <li><code>inline-block</code>: เรียงแนวนอน + ปรับขนาดได้</li>
+                    <li><code>none</code>: ซ่อน element ออกจาก layout ทั้งหมด</li>
+                </ul>
+                <p><strong>Position values:</strong></p>
+                <ul>
+                    <li><code>static</code>: default — ไหลตาม document flow ปกติ</li>
+                    <li><code>relative</code>: ขยับจากตำแหน่งเดิมของตัวเอง ยังกินพื้นที่เดิม</li>
+                    <li><code>absolute</code>: หลุดจาก flow ไปอ้างอิงกับ parent ที่ไม่ใช่ static</li>
+                    <li><code>fixed</code>: ติดกับ viewport ไม่เลื่อนตามหน้า</li>
+                    <li><code>sticky</code>: ไหลปกติจนถึงจุดที่กำหนด แล้วค้างไว้</li>
+                </ul>
+            </div>
+            <div class="pitfall-box">
+                <strong>⚠️ ข้อควรระวัง:</strong> โดยเริ่มต้นเบราว์เซอร์ใช้ <code>box-sizing: content-box</code> — ถ้าตั้งความกว้าง 100px แล้วใส่ padding 20px กล่องจะขยายเป็น 140px! <strong>แก้ไขด้วย:</strong> ใส่ <code>*, *::before, *::after { box-sizing: border-box; }</code> ไว้บนสุดของ CSS ทุกโปรเจกต์
+            </div>
+            <div class="sandbox">
+                <div class="sandbox-hd"><span>Box Model & Position Demo</span><button class="run-btn" onclick="runCode('css6')">Run Code</button></div>
+                <div class="sandbox-body">
+                    <textarea id="txt-css6"><style>
+  * { box-sizing: border-box; font-family: sans-serif; }
+
+  /* Box Model เปรียบเทียบ */
+  .box { width: 200px; padding: 20px; border: 3px solid #ec4899; margin: 10px; display: inline-block; }
+
+  /* Position demo */
+  .container { position: relative; background: #f0f9ff; height: 100px; border: 2px dashed #94a3b8; margin: 15px 0; }
+  .abs-box { position: absolute; bottom: 10px; right: 10px; background: #ec4899; color: white; padding: 5px 10px; border-radius: 4px; }
+  .sticky-demo { position: sticky; top: 0; background: #1e293b; color: white; padding: 5px 15px; }
+</style>
+
+<p class="sticky-demo">🔒 Sticky Header — เลื่อนดูด้านล่างแล้วสังเกต</p>
+
+<div class="box" style="background: #fce7f3;">
+  border-box: กล่องนี้<br>กว้างแค่ 200px เสมอ
+</div>
+
+<div class="container">
+  <p style="padding:10px;">Parent: position relative</p>
+  <div class="abs-box">Absolute: มุมขวาล่าง</div>
+</div></textarea>
+                    <iframe id="ifr-css6"></iframe>
+                </div>
+            </div>
+            <div class="quiz-box">
+                <h3>🧠 Quiz — คลิกที่คำถามเพื่อดูคำตอบ</h3>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q1: ความแตกต่างระหว่าง <code>display:none</code> และ <code>visibility:hidden</code> คืออะไร?</strong></p>
+                    <div class="answer">✅ <code>display:none</code> ลบ element ออกจาก layout ทั้งหมด (ไม่กินพื้นที่) ส่วน <code>visibility:hidden</code> ซ่อนแต่ยังกินพื้นที่เดิมอยู่ (มีช่องว่างโล่งๆ)</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q2: Margin Collapse คืออะไร?</strong></p>
+                    <div class="answer">✅ เมื่อ block element 2 ตัวอยู่ติดกันในแนวตั้ง margin จะ "พับรวมกัน" เหลือแค่ค่ามากสุด เช่น margin-bottom: 20px + margin-top: 30px = ระยะห่างแค่ 30px (ไม่ใช่ 50px) ปัญหานี้ไม่เกิดใน Flex/Grid</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q3: <code>position: sticky</code> ต่างจาก <code>fixed</code> อย่างไร?</strong></p>
+                    <div class="answer">✅ <code>sticky</code> ไหลตาม document flow ปกติก่อน แล้วค้างอยู่กับที่เมื่อเลื่อนถึงจุดที่กำหนด (เช่น header ที่ค้างเมื่อ scroll) ส่วน <code>fixed</code> ออกจาก flow ตลอด ติดกับ viewport ทันที</div>
+                </div>
+            </div>
+            <div class="challenge-box">
+                <h3>💪 Challenge</h3>
+                <p>สร้าง Card ที่มี badge "NEW" อยู่มุมขวาบนโดยใช้ <code>position: relative</code> บน card และ <code>position: absolute</code> บน badge</p>
+            </div>
+        </div>
+
+        <!-- บทที่ 9-11 -->
+        <div id="css9" class="lesson-section">
+            <h2>บทที่ 9-11 Flexbox, Grid Layout & Responsive Design</h2>
+            <div class="theory-box">
+                <p><strong>Flexbox (1 มิติ):</strong> จัดเรียง items ในแนวแถว (row) หรือแนวคอลัมน์ (column) ทีละแกน</p>
+                <ul>
+                    <li><code>display: flex</code>: เปิดใช้ Flexbox บน container</li>
+                    <li><code>justify-content</code>: จัดเรียงตาม Main Axis (ค่าเริ่มต้นคือแนวนอน)</li>
+                    <li><code>align-items</code>: จัดเรียงตาม Cross Axis</li>
+                    <li><code>flex-wrap: wrap</code>: อนุญาตให้ item ขึ้นบรรทัดใหม่</li>
+                    <li><code>gap</code>: ระยะห่างระหว่าง items</li>
+                    <li><code>flex: 1</code>: item นี้ขยายเต็มพื้นที่ที่เหลือ</li>
+                </ul>
+                <p><strong>Grid (2 มิติ):</strong> จัดเรียงทั้ง row และ column พร้อมกัน</p>
+                <ul>
+                    <li><code>grid-template-columns: repeat(3, 1fr)</code>: 3 คอลัมน์กว้างเท่ากัน</li>
+                    <li><code>grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))</code>: Responsive Grid อัตโนมัติ</li>
+                    <li><code>grid-column: 1 / 3</code>: item กินพื้นที่ข้ามคอลัมน์</li>
+                </ul>
+                <p><strong>Responsive Design:</strong> <code>@media (max-width: 768px) { ... }</code> — Mobile First: เขียน style มือถือก่อน แล้ว override ด้วย min-width</p>
+            </div>
+            <div class="pitfall-box">
+                <strong>⚠️ ข้อควรระวัง:</strong> เมื่อใช้ <code>flex-direction: column</code> แกนจะสลับ! <code>justify-content</code> จะจัดแนวตั้งแทน และ <code>align-items</code> จะจัดแนวนอนแทน ทำให้โค้ดที่เคย center ในแนวนอนกลับไม่ทำงานเมื่อเปลี่ยน direction
+            </div>
+            <div class="sandbox">
+                <div class="sandbox-hd"><span>Flexbox & Grid Demo</span><button class="run-btn" onclick="runCode('css9')">Run Code</button></div>
+                <div class="sandbox-body">
+                    <textarea id="txt-css9"><style>
+  * { box-sizing: border-box; font-family: sans-serif; margin: 0; padding: 0; }
+  body { padding: 15px; }
+
+  /* Flexbox: Navbar */
+  .navbar { display: flex; justify-content: space-between; align-items: center;
+    background: #1e293b; padding: 12px 20px; border-radius: 8px; margin-bottom: 15px; }
+  .navbar a { color: #94a3b8; text-decoration: none; margin-left: 15px; }
+  .logo { color: #ec4899; font-weight: bold; }
+
+  /* Grid: Card Layout */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+  .card { background: #f0f9ff; border: 1px solid #bae6fd; padding: 15px; border-radius: 8px; text-align: center; }
+  .card span { font-size: 2rem; display: block; }
+</style>
+
+<nav class="navbar">
+  <span class="logo">🎨 DevHub</span>
+  <div><a href="#">HTML</a><a href="#">CSS</a><a href="#">JS</a></div>
+</nav>
+
+<div class="grid">
+  <div class="card"><span>🎯</span>Flexbox</div>
+  <div class="card"><span>🔲</span>Grid</div>
+  <div class="card"><span>📱</span>Responsive</div>
+</div></textarea>
+                    <iframe id="ifr-css9"></iframe>
+                </div>
+            </div>
+            <div class="quiz-box">
+                <h3>🧠 Quiz — คลิกที่คำถามเพื่อดูคำตอบ</h3>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q1: เมื่อไหรควรใช้ Flexbox และเมื่อไหรควรใช้ Grid?</strong></p>
+                    <div class="answer">✅ ใช้ Flexbox เมื่อจัดเรียงใน 1 ทิศทาง (เช่น navbar, button group, card items ในแถว) ใช้ Grid เมื่อต้องการ layout 2 มิติ (เช่น หน้า dashboard, magazine layout, photo gallery)</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q2: <code>1fr</code> หมายความว่าอะไร?</strong></p>
+                    <div class="answer">✅ "1 fraction" หรือ 1 ส่วนของพื้นที่ว่างที่เหลือ ถ้า <code>grid-template-columns: 1fr 2fr 1fr</code> = แบ่งเป็น 4 ส่วน คอลัมน์ 1 ได้ 1 ส่วน คอลัมน์ 2 ได้ 2 ส่วน คอลัมน์ 3 ได้ 1 ส่วน</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q3: Mobile First กับ Desktop First ต่างกันอย่างไร และอันไหนดีกว่า?</strong></p>
+                    <div class="answer">✅ Mobile First: เขียน CSS สำหรับมือถือก่อน ใช้ <code>min-width</code> ขยายออก ส่วน Desktop First: เขียนสำหรับ desktop แล้วใช้ <code>max-width</code> ลดลง Mobile First ดีกว่าเพราะ CSS โหลดน้อยกว่าบนมือถือ และเป็นมาตรฐานของ Tailwind, Bootstrap ยุคใหม่</div>
+                </div>
+            </div>
+            <div class="challenge-box">
+                <h3>💪 Challenge</h3>
+                <p>สร้าง Dashboard Layout ที่มี: Sidebar กว้าง 250px ทางซ้าย และ Main content ที่ขยายเต็มพื้นที่ที่เหลือทางขวา โดยใช้ Flexbox หรือ Grid</p>
+            </div>
+        </div>
+
+        <!-- บทที่ 12-14 -->
+        <div id="css12" class="lesson-section">
+            <h2>บทที่ 12-14 Transform, Transition & Animation</h2>
+            <div class="theory-box">
+                <p><strong>Transform:</strong> เปลี่ยนรูปทรงโดยไม่กระทบ layout ของ element อื่น</p>
+                <ul>
+                    <li><code>translate(x, y)</code>: ขยับตำแหน่ง</li>
+                    <li><code>rotate(45deg)</code>: หมุน</li>
+                    <li><code>scale(1.2)</code>: ขยาย/ย่อ</li>
+                    <li><code>skew(10deg)</code>: บิดเฉียง</li>
+                    <li>สามารถรวมกันได้: <code>transform: translateX(10px) rotate(45deg) scale(1.1)</code></li>
+                </ul>
+                <p><strong>Transition:</strong> ทำให้การเปลี่ยนสไตล์เกิดขึ้นอย่างนุ่มนวล</p>
+                <ul>
+                    <li><code>transition: property duration easing delay</code></li>
+                    <li>ตัวอย่าง: <code>transition: all 0.3s ease-in-out</code></li>
+                </ul>
+                <p><strong>Animation:</strong> ควบคุมความเคลื่อนไหวเป็น keyframe</p>
+                <ul>
+                    <li><code>@keyframes name { from { } to { } }</code></li>
+                    <li><code>animation: name duration easing iteration</code></li>
+                    <li><code>animation-fill-mode: forwards</code>: หยุดที่ keyframe สุดท้าย</li>
+                </ul>
+            </div>
+            <div class="pitfall-box">
+                <strong>⚠️ ข้อควรระวัง:</strong> <strong>อย่า animate ด้วย <code>width</code>, <code>height</code>, <code>top</code>, <code>margin</code></strong> — คุณสมบัติเหล่านี้ทำให้เบราว์เซอร์คำนวณ Layout ใหม่ทั้งหน้าในทุก frame (Layout Reflow) ทำให้กระตุกมาก ให้ใช้ <code>transform</code> และ <code>opacity</code> แทน เพราะ GPU จัดการได้โดยตรง
+            </div>
+            <div class="sandbox">
+                <div class="sandbox-hd"><span>Animation & Transform Demo</span><button class="run-btn" onclick="runCode('css12')">Run Code</button></div>
+                <div class="sandbox-body">
+                    <textarea id="txt-css12"><style>
+  * { box-sizing: border-box; font-family: sans-serif; }
+  body { padding: 20px; background: #0f172a; color: white; }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.7; }
+  }
+  @keyframes slideIn {
+    from { transform: translateX(-50px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  .btn {
+    display: inline-block; padding: 12px 24px; background: #ec4899;
+    color: white; border: none; border-radius: 8px; cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    margin: 10px;
+  }
+  .btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(236,72,153,0.4); }
+
+  .pulse-box {
+    width: 60px; height: 60px; background: #38bdf8; border-radius: 50%;
+    animation: pulse 2s infinite; display: inline-block; margin: 10px;
+  }
+  .slide-box {
+    background: #10b981; padding: 10px 20px; border-radius: 8px; margin: 10px;
+    animation: slideIn 0.5s ease-out forwards;
+  }
+</style>
+
+<button class="btn">Hover ดูการเปลี่ยนแปลง ✨</button>
+
+<div>
+  <div class="pulse-box"></div>
+  <span style="vertical-align: middle;">← Pulse Animation (scale + opacity)</span>
+</div>
+
+<div class="slide-box">Slide In Animation (translateX + opacity)</div></textarea>
+                    <iframe id="ifr-css12"></iframe>
+                </div>
+            </div>
+            <div class="quiz-box">
+                <h3>🧠 Quiz — คลิกที่คำถามเพื่อดูคำตอบ</h3>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q1: ทำไม <code>transform: translate()</code> ดีกว่าการเปลี่ยน <code>top/left</code> สำหรับ animation?</strong></p>
+                    <div class="answer">✅ <code>transform</code> ประมวลผลด้วย GPU (Compositor Thread) โดยตรง ไม่ต้องให้ CPU คำนวณ Layout ใหม่ ทำให้ได้ 60fps ลื่นไหล ส่วน <code>top/left</code> trigger Layout → Paint → Composite ทุก frame ทำให้กระตุก</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q2: <code>animation-iteration-count: infinite</code> กับ <code>3</code> ต่างกันอย่างไร?</strong></p>
+                    <div class="answer">✅ <code>infinite</code> วนซ้ำไม่หยุด ส่วน <code>3</code> เล่น animation 3 รอบแล้วหยุด ถ้าต้องการหยุดที่ state สุดท้ายให้เพิ่ม <code>animation-fill-mode: forwards</code></div>
+                </div>
+            </div>
+            <div class="challenge-box">
+                <h3>💪 Challenge</h3>
+                <p>สร้าง Loading Spinner: วงกลมขอบสี pink ที่หมุนวน (rotate 0→360deg) อย่างต่อเนื่อง โดยใช้ <code>@keyframes</code> + <code>animation: infinite linear</code></p>
+            </div>
+        </div>
+
+        <!-- บทที่ 15-17 -->
+        <div id="css15" class="lesson-section">
+            <h2>บทที่ 15-17 Pseudo Classes, Pseudo Elements & CSS Variables</h2>
+            <div class="theory-box">
+                <p><strong>Pseudo Classes (สถานะ):</strong> ตรวจจับสถานะของ element:</p>
+                <ul>
+                    <li><code>:hover</code>: เมื่อเมาส์ชี้</li>
+                    <li><code>:focus</code>: เมื่อกำลัง focus (tab หรือคลิก)</li>
+                    <li><code>:active</code>: เมื่อกำลังคลิกค้างอยู่</li>
+                    <li><code>:nth-child(2n)</code>: เลือกตัวที่ 2, 4, 6... (เลขคู่)</li>
+                    <li><code>:not(.excluded)</code>: เลือกทุกตัวที่ไม่ตรง selector ที่กำหนด</li>
+                    <li><code>:has(img)</code>: เลือก element ที่มี img ข้างใน (CSS ยุคใหม่)</li>
+                </ul>
+                <p><strong>Pseudo Elements (สร้าง element จำลอง):</strong></p>
+                <ul>
+                    <li><code>::before</code> / <code>::after</code>: เสก element จำลองโดยไม่เพิ่ม HTML — <strong>ต้องมี <code>content: ""</code> เสมอ</strong></li>
+                    <li><code>::first-letter</code>: ตัวอักษรแรก (เช่น Drop Cap)</li>
+                    <li><code>::placeholder</code>: สไตล์ข้อความ placeholder ใน input</li>
+                    <li><code>::selection</code>: สไตล์เมื่อผู้ใช้ drag select ข้อความ</li>
+                </ul>
+                <p><strong>CSS Variables (Custom Properties):</strong> ประกาศตัวแปรด้วย <code>--name: value</code> แล้วใช้ด้วย <code>var(--name)</code></p>
+                <ul>
+                    <li>ประกาศที่ <code>:root</code> เพื่อใช้ได้ทั้งไฟล์</li>
+                    <li>เปลี่ยนค่าด้วย JS: <code>document.documentElement.style.setProperty('--color', 'red')</code></li>
+                </ul>
+            </div>
+            <div class="pitfall-box">
+                <strong>⚠️ ข้อควรระวัง:</strong> <code>::before</code> และ <code>::after</code> จะไม่แสดงผลถ้าลืม <code>content: ""</code> — แม้แต่ค่าว่างก็ต้องใส่ นอกจากนี้ Pseudo elements ใช้ <code>::</code> (2 colons) แต่ Pseudo classes ใช้ <code>:</code> (1 colon)
+            </div>
+            <div class="sandbox">
+                <div class="sandbox-hd"><span>Pseudo & Variables Demo</span><button class="run-btn" onclick="runCode('css15')">Run Code</button></div>
+                <div class="sandbox-body">
+                    <textarea id="txt-css15"><style>
+  :root {
+    --primary: #ec4899;
+    --radius: 8px;
+    --shadow: 0 4px 15px rgba(0,0,0,0.15);
+  }
+
+  body { font-family: sans-serif; padding: 20px; }
+
+  /* Pseudo class: nth-child */
+  li:nth-child(odd) { background: #fce7f3; padding: 5px 10px; }
+  li:nth-child(even) { background: #f0f9ff; padding: 5px 10px; }
+  li:hover { background: var(--primary); color: white; cursor: pointer; }
+
+  /* Pseudo element: ขีดเส้นใต้ */
+  .underline-link { text-decoration: none; color: var(--primary); position: relative; }
+  .underline-link::after {
+    content: "";
+    position: absolute;
+    bottom: -2px; left: 0;
+    width: 0; height: 2px;
+    background: var(--primary);
+    transition: width 0.3s ease;
+  }
+  .underline-link:hover::after { width: 100%; }
+
+  /* CSS Variable for theming */
+  .card {
+    border: 2px solid var(--primary);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 15px;
+    margin-top: 15px;
+  }
+</style>
+
+<ul style="list-style:none; padding:0;">
+  <li>รายการที่ 1 (odd)</li>
+  <li>รายการที่ 2 (even)</li>
+  <li>รายการที่ 3 (odd)</li>
+  <li>รายการที่ 4 (even)</li>
+</ul>
+
+<br>
+<a href="#" class="underline-link">Hover ดู underline animation ✨</a>
+
+<div class="card">Card ที่ใช้ CSS Variables — ลองเปลี่ยน --primary ด้านซ้าย!</div></textarea>
+                    <iframe id="ifr-css15"></iframe>
+                </div>
+            </div>
+            <div class="quiz-box">
+                <h3>🧠 Quiz — คลิกที่คำถามเพื่อดูคำตอบ</h3>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q1: ทำไม <code>::before</code> ถึงไม่แสดงผลทั้งที่เขียน CSS ถูกต้อง?</strong></p>
+                    <div class="answer">✅ 99% ของกรณีคือลืมใส่ <code>content: "";</code> — แม้แต่ค่าว่างก็ต้องมี เพราะนี่คือ required property ของ pseudo elements</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q2: CSS Variables ต่างจาก SASS Variables อย่างไร?</strong></p>
+                    <div class="answer">✅ CSS Variables (Custom Properties) ทำงาน runtime ใน browser สามารถเปลี่ยนค่าด้วย JavaScript ได้ และรู้จัก CSS Cascade ส่วน SASS Variables ทำงานตอน compile time เป็นแค่ shortcut การเขียนโค้ด ไม่สามารถ dynamic ได้ใน browser</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- บทที่ 18-19 -->
+        <div id="css18" class="lesson-section">
+            <h2>บทที่ 18-19 Advanced & Modern CSS Features</h2>
+            <div class="theory-box">
+                <p><strong>CSS Architecture:</strong></p>
+                <ul>
+                    <li><strong>BEM (Block__Element--Modifier):</strong> ระบบตั้งชื่อ class เช่น <code>.card__title--highlighted</code> — Block=card, Element=title, Modifier=highlighted ป้องกัน class ชนกัน</li>
+                    <li><strong>SMACSS:</strong> แบ่ง CSS เป็น Base, Layout, Module, State, Theme</li>
+                    <li><strong>Utility-first (Tailwind):</strong> ใช้ class สำเร็จรูปสั้นๆ เช่น <code>flex gap-4 p-6 text-pink-500</code></li>
+                </ul>
+                <p><strong>Modern CSS Functions:</strong></p>
+                <ul>
+                    <li><code>clamp(min, preferred, max)</code>: font-size ที่ scale ตามหน้าจออัตโนมัติ เช่น <code>font-size: clamp(1rem, 2.5vw, 2rem)</code></li>
+                    <li><code>calc(100% - 40px)</code>: คำนวณขนาดผสมหน่วยต่างกัน</li>
+                    <li><code>min() / max()</code>: เลือกค่าที่เล็ก/ใหญ่ที่สุด</li>
+                </ul>
+                <p><strong>Modern CSS Spec (ปี 2024+):</strong></p>
+                <ul>
+                    <li><strong>CSS Nesting:</strong> เขียน CSS ซ้อนกันได้โดยตรงเหมือน SCSS แล้ว (browser รองรับแล้ว)</li>
+                    <li><strong>Container Queries:</strong> <code>@container</code> — สไตล์ตามขนาดของ parent container (ไม่ใช่ viewport) ยืดหยุ่นกว่า Media Query มาก</li>
+                    <li><strong>CSS Layers:</strong> <code>@layer</code> — จัดลำดับความสำคัญของ CSS ชัดเจนขึ้น</li>
+                </ul>
+            </div>
+            <div class="pitfall-box">
+                <strong>⚠️ ข้อควรระวัง:</strong> BEM ทำให้ชื่อ class ยาวมาก ถ้าใช้กับ framework อย่าง React ที่มี CSS Modules หรือ Tailwind อยู่แล้ว อาจไม่จำเป็น ให้เลือก methodology ตามขนาดทีมและ stack ที่ใช้
+            </div>
+            <div class="sandbox">
+                <div class="sandbox-hd"><span>Modern CSS Demo</span><button class="run-btn" onclick="runCode('css18')">Run Code</button></div>
+                <div class="sandbox-body">
+                    <textarea id="txt-css18"><style>
+  :root { --primary: #ec4899; }
+  body { font-family: sans-serif; padding: 20px; }
+
+  /* clamp(): Fluid Typography */
+  .fluid-title {
+    font-size: clamp(1rem, 4vw, 2.5rem);
+    color: var(--primary);
+    margin-bottom: 15px;
+  }
+
+  /* CSS Nesting (Modern CSS) */
+  .card {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 10px 0;
+    transition: all 0.2s;
+
+    & h3 { color: #1e293b; margin-bottom: 8px; }
+    & p { color: #64748b; font-size: 0.9rem; }
+    &:hover {
+      border-color: var(--primary);
+      box-shadow: 0 4px 20px rgba(236,72,153,0.2);
+      transform: translateY(-2px);
+    }
+  }
+
+  /* calc(): ความกว้างผสมหน่วย */
+  .sidebar-layout { display: flex; gap: 15px; }
+  .sidebar { width: 150px; background: #1e293b; color: white; padding: 10px; border-radius: 8px; }
+  .main { width: calc(100% - 165px); background: #f0f9ff; padding: 10px; border-radius: 8px; }
+</style>
+
+<h2 class="fluid-title">ข้อความนี้ scale ตามหน้าจอ (clamp)</h2>
+
+<div class="card">
+  <h3>CSS Nesting Card</h3>
+  <p>Hover ดูเอฟเฟกต์ — ใช้ CSS Nesting (&) เขียน child styles ข้างใน</p>
+</div>
+
+<div class="sidebar-layout">
+  <div class="sidebar">Sidebar (150px)</div>
+  <div class="main">Main = calc(100% - 165px)</div>
+</div></textarea>
+                    <iframe id="ifr-css18"></iframe>
+                </div>
+            </div>
+            <div class="quiz-box">
+                <h3>🧠 Quiz — คลิกที่คำถามเพื่อดูคำตอบ</h3>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q1: <code>clamp(1rem, 2vw, 3rem)</code> จะทำงานอย่างไรบนหน้าจอกว้าง 1440px?</strong></p>
+                    <div class="answer">✅ 2vw × 1440px = 28.8px ≈ 1.8rem — อยู่ระหว่าง min (1rem=16px) และ max (3rem=48px) จึงใช้ 1.8rem บนหน้าจอเล็กกว่า min-width ที่ให้ 2vw < 1rem จะใช้ 1rem แทน</div>
+                </div>
+                <div class="quiz-item" onclick="this.querySelector('.answer').style.display='block'">
+                    <p><strong>Q2: Container Queries ดีกว่า Media Queries อย่างไร?</strong></p>
+                    <div class="answer">✅ Media Queries ตรวจขนาด viewport (หน้าจอทั้งหมด) ส่วน Container Queries ตรวจขนาดของ parent container ทำให้ component ปรับสไตล์ตามพื้นที่จริงที่ตัวเองมี เหมาะกับ reusable components ที่ใช้ได้ทั้ง sidebar (แคบ) และ main (กว้าง)</div>
+                </div>
+            </div>
+            <div class="tip-box">
+                <strong>💡 Pro Tip — เส้นทาง CSS ต่อไป:</strong> หลังจากเชี่ยวชาญ CSS แล้ว ให้เรียน Tailwind CSS (Utility-first) เพราะเป็น standard ในอุตสาหกรรมในปัจจุบัน จากนั้นเรียน CSS-in-JS (Styled Components / Emotion) สำหรับ React projects และ CSS Modules สำหรับ Next.js
+            </div>
+            <div class="challenge-box">
+                <h3>💪 Final CSS Challenge</h3>
+                <p>สร้าง Responsive Card Grid: 3 columns บน desktop, 2 columns บน tablet (768px), 1 column บน mobile (480px) โดยใช้ <code>@media</code> + <code>clamp()</code> สำหรับ font-size + CSS Variables สำหรับสี</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function openLesson(id) {
+            document.querySelectorAll('.lesson-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.currentTarget.classList.add('active');
+            const txtEl = document.getElementById('txt-' + id);
+            if (txtEl) runCode(id);
+        }
+        function runCode(id) {
+            const txt = document.getElementById('txt-' + id);
+            const ifr = document.getElementById('ifr-' + id);
+            if (!txt || !ifr) return;
+            const doc = ifr.contentDocument || ifr.contentWindow.document;
+            doc.open(); doc.write(txt.value); doc.close();
+        }
+        window.onload = function() { runCode('css1'); }
+    </script>
+</body>
+</html>

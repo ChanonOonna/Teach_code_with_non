@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>JS ตัวแปร ชนิดข้อมูล ฟังก์ชัน และโครงสร้างควบคุม | W3schools Thai Style</title>
+<style>
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f4f4f4;
+    color: #222;
+    margin: 0;
+    padding: 0;
+}
+.header-w3 {
+    background: #04aa6d;
+    color: #fff;
+    padding: 26px 0 20px 0;
+    text-align: center;
+    font-size: 2.3em;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+nav {
+    background: #333;
+    text-align: center;
+    padding: 13px 0;
+}
+nav a {
+    color: #fff;
+    padding: 0 22px;
+    text-decoration: none;
+    font-size: 1.1em;
+    display: inline-block;
+    border-radius: 3px;
+    transition: background 0.2s;
+}
+nav a:hover {
+    background: #059862;
+}
+main {
+    max-width: 920px;
+    margin: 32px auto;
+    padding: 35px 26px 56px 26px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1.5px solid #c4c4c4;
+    box-shadow: 0 3px 24px #adb6be22;
+    min-height: 640px;
+}
+h1, h2 {
+    color: #04aa6d;
+    margin-bottom: 13px;
+}
+h2 { font-size: 1.6em; }
+.section-w3 { margin: 30px 0 28px 0; }
+.ex-w3 {
+    background: #f5fbff;
+    border-left: 4px solid #027bf3;
+    padding: 14px 18px 16px 22px;
+    border-radius: 5px;
+    margin: 20px 0 17px 0;
+}
+.codeexample, pre {
+    background: #262829;
+    color: #e3e3e3;
+    font-size: 1.1em;
+    margin: 12px 0 10px 0;
+    padding: 18px 18px 15px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    line-height: 1.62;
+    font-family: 'Fira Mono', 'Consolas', monospace;
+}
+.output-example {
+    background: #fff9eb;
+    border: 1px solid #eadfc2;
+    padding: 15px 20px 11px 20px;
+    border-radius: 4px;
+    margin: 10px 0 12px 0;
+    font-size: 1.05em;
+}
+.note-w3 {
+    background: #fffada;
+    border-left: 4px solid #ffe082;
+    padding: 12px 19px;
+    border-radius: 4px;
+    margin: 18px 0 14px 0;
+    color: #57411c;
+}
+ul, ol {
+    margin-top: 7px;
+    margin-bottom: 12px;
+}
+.challenge-w3 {
+    background: #f6f4fa;
+    border-left: 4px solid #a580db;
+    padding: 15px 20px 16px 24px;
+    border-radius: 6px;
+    margin: 19px 0 19px 0;
+}
+footer {
+    background: #232323;
+    color: #eaeaea;
+    text-align: center;
+    padding: 18px 0 16px;
+    margin-top: 65px;
+    font-size: 1em;
+    letter-spacing: 0.5px;
+}
+@media (max-width: 980px) {
+    main {max-width:98vw;}
+}
+</style>
+</head>
+<body>
+<div class="header-w3">
+  <span style="font-weight:900;">W3schools Thai Clone</span> JavaScript เบื้องต้น: ตัวแปร & โครงสร้างควบคุม
+</div>
+<nav>
+    <a href="#js-types">Variable Types</a>
+    <a href="#js-func">Function</a>
+    <a href="#js-control">Control</a>
+</nav>
+<main>
+  <section class="overview-card">
+    <h2 style="margin-top:0;">JavaScript: ตัวแปร ชนิดข้อมูล และโครงสร้างควบคุม</h2>
+    <ul class="tag-list">
+      <li><b>Type & ตัวแปร</b>: รู้จัก var let const, string, number, boolean, array, object</li>
+      <li><b>Function</b>: การสร้างและเรียกใช้ฟังก์ชัน</li>
+      <li><b>Control Structure</b>: if/else, while, do..while, for</li>
+    </ul>
+  </section>
+
+  <section id="js-types" class="section-w3">
+    <h1>ชนิดตัวแปรใน JavaScript</h1>
+    <div class="ex-w3">
+      <b>ตัวแปร (Variable)</b>
+      <ul>
+        <li>ประกาศด้วย <code>var</code>, <code>let</code>, <code>const</code></li>
+        <li>
+          ชนิดข้อมูลหลัก:
+          <ul>
+            <li><b>String</b> - ตัวอักษร: <code>let name = "นารี";</code></li>
+            <li><b>Number</b> - ตัวเลข: <code>let age = 15;</code></li>
+            <li><b>Boolean</b> - จริง/เท็จ: <code>let active = true;</code></li>
+            <li><b>Array</b> - กลุ่มข้อมูล: <code>let scores = [10, 15, 20];</code></li>
+            <li><b>Object</b> - เก็บข้อมูลซ้อน (key/value): <code>let person = {name:"นารี", age:15};</code></li>
+          </ul>
+        </li>
+      </ul>
+      <div class="note-w3">
+        <b>var</b> (เก่า), <b>let</b> (ตัวแปรเปลี่ยนค่าได้), <b>const</b> (ค่าคงที่ เปลี่ยนค่าไม่ได้)
+      </div>
+    </div>
+    <div class="ex-w3">
+      <b>ตัวอย่างการสร้างตัวแปรชนิดต่าง ๆ</b>
+      <pre class="codeexample">
+&lt;script&gt;
+// String
+let name = "สมชาย";
+// Number
+let score = 90;
+// Boolean
+let pass = true;
+// Array
+let subjects = ["Math", "JS", "CSS"];
+// Object
+const person = { name: "สมชาย", age: 20 };
+
+console.log(name, score, pass, subjects, person);
+&lt;/script&gt;
+      </pre>
+      <div class="output-example">
+        <button onclick="console.log('สมชาย', 90, true, ['Math','JS','CSS'], {name:'สมชาย',age:20});alert('เช็คผลที่ console (F12)')"
+          style="background:#027bf3;color:white;padding:8px 20px;border:0;border-radius:5px;cursor:pointer">
+          ทดสอบตัวแปร JS
+        </button>
+        <span style="font-size:.93em;color:gray;">* เปิด Dev tools (F12) จะเห็นค่าต่างๆ</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="js-func" class="section-w3">
+    <h1>Function (ฟังก์ชัน) ใน JavaScript</h1>
+    <div class="ex-w3">
+      <b>ฟังก์ชัน</b> คือ คำสั่งกลุ่มหนึ่งที่เรียกใช้ซ้ำได้ <br>
+      ตัวอย่าง:
+      <pre class="codeexample">
+&lt;script&gt;
+function sayHello(name) {
+  console.log("สวัสดี", name);
+}
+
+sayHello("สมชาย");
+&lt;/script&gt;
+      </pre>
+      <div class="output-example">
+        <button onclick="(function sayHello(name){console.log('สวัสดี', name);})('สมชาย');alert('ดู console (F12)')"
+        style="background:#04aa6d;color:white;padding:8px 20px;border:0;border-radius:5px;cursor:pointer">
+        ทดสอบฟังก์ชัน sayHello
+        </button>
+        <span style="font-size:.93em;color:gray;">* ดูคำว่า "สวัสดี สมชาย" ใน console</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="js-control" class="section-w3">
+    <h1>if, else, while, do while, for</h1>
+    <div class="ex-w3">
+      <b>if / else</b> เงื่อนไขใน JS:
+      <pre class="codeexample">
+&lt;script&gt;
+let score = 60;
+
+if (score >= 50) {
+  console.log("ผ่าน");
+} else {
+  console.log("ไม่ผ่าน");
+}
+&lt;/script&gt;
+      </pre>
+      <div class="output-example">
+        <button onclick="var score=60;if(score>=50){console.log('ผ่าน');}else{console.log('ไม่ผ่าน');}alert('ดูผลใน console')"
+        style="background:#027bf3;color:white;padding:8px 20px;border:0;border-radius:5px;cursor:pointer">
+        ทดสอบ if/else
+        </button>
+      </div>
+    </div>
+    <div class="ex-w3">
+      <b>while, do while, for (ลูปวนซ้ำ)</b> <br>
+      <ul>
+        <li><b>while</b>: วนจนเงื่อนไขเป็นเท็จ</li>
+        <li><b>do while</b>: ทำก่อน 1 ครั้งเสมอ</li>
+        <li><b>for</b>: นิยมใช้เมื่อรู้จำนวนรอบ</li>
+      </ul>
+      <pre class="codeexample">
+&lt;script&gt;
+// while
+let n = 0;
+while(n &lt; 3) {
+  console.log("while", n);
+  n++;
+}
+
+// do while
+let m = 0;
+do {
+  console.log("do while", m);
+  m++;
+} while(m &lt; 2);
+
+// for
+for(let i=0; i&lt;4; i++) {
+  console.log("for", i);
+}
+&lt;/script&gt;
+      </pre>
+      <div class="output-example">
+        <button style="background:#a580db;color:white;padding:8px 20px;border:0;border-radius:5px;cursor:pointer"
+        onclick="
+          let out = [];
+          let n=0; while(n<3){out.push('while '+n);n++;}
+          let m=0; do{out.push('do while '+m);m++;}while(m<2);
+          for(let i=0;i<4;i++){out.push('for '+i);}
+          out.forEach(e=>console.log(e));
+          alert('เปิด console เพื่อดูผลลัพธ์')
+        ">ทดสอบ while / do while / for</button>
+        <span style="font-size:.93em;color:gray;">* ดูลำดับใน console</span>
+      </div>
+    </div>
+    <div class="note-w3">
+      <b>Tip:</b> สามารถผสม if, ลูป, ฟังก์ชันในการเขียนโปรแกรมแก้ปัญหาได้!
+    </div>
+    <div class="challenge-w3">
+      <b>ลองฝึก JS:</b>
+      <ol>
+        <li>สร้างตัวแปร array แล้วใช้ for วนแสดงทีละค่าใน console</li>
+        <li>สร้างฟังก์ชันเช็คเลขคู่/คี่ แบบใช้ if</li>
+        <li>เขียนลูป while ให้แสดงเลข 1-5</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section-w3">
+    <h2>Roadmap JS มือใหม่</h2>
+    <ul>
+      <li><b>1. เข้าใจชนิดข้อมูล ตัวแปร</b> (string, number, boolean, array, object)</li>
+      <li><b>2. ใช้ if/else, while, do while, for</b></li>
+      <li><b>3. สร้าง function เรียกใช้งานซ้ำ</b></li>
+      <li><b>4. นำไปใช้ในโค้ดจริง เช่น ตรวจสอบ/วนแสดงข้อมูล</b></li>
+    </ul>
+    <div class="note-w3">
+      <b>ทิปส์:</b> ทดลองเปลี่ยนค่าตัวแปร หรือลูป แล้วดูผลใน console จะช่วยให้เข้าใจดีขึ้น!
+    </div>
+  </section>
+</main>
+<footer>
+  ©2024 Thai W3schools Guide | สรุปพื้นฐานตัวแปร ชนิดข้อมูล และ control structure JS
+</footer>
+</body>
+</html>

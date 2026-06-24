@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>บทที่ 2 HTML Document Structure</title>
+    <style>
+        body { background: #0b0f19; color: #e2e8f0; font-family: sans-serif; padding: 40px; }
+        .back-link { color: #38bdf8; text-decoration: none; font-weight: bold; display: inline-block; margin-bottom: 20px; }
+        h1 { color: #fff; margin-bottom: 20px; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
+        .detail-box { background: #1e293b; padding: 20px; border-radius: 8px; line-height: 1.6; }
+        .detail-box li { margin-bottom: 10px; }
+        
+        /* Interactive Sandbox Layout */
+        .sandbox { background: #111827; border: 1px solid #334155; border-radius: 12px; overflow: hidden; }
+        .sandbox-header { background: #1f2937; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .run-btn { background: #10b981; color: white; border: none; padding: 6px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .sandbox-body { display: grid; grid-template-columns: 1fr 1fr; height: 350px; }
+        textarea { width: 100%; height: 100%; background: #0f172a; color: #34d399; font-family: monospace; padding: 15px; border: none; resize: none; outline: none; font-size: 0.95rem; }
+        iframe { width: 100%; height: 100%; background: white; border: none; }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-link">← กลับหน้าสารบัญหลัก</a>
+    <h1>บทที่ 2 HTML Document Structure (โครงสร้างไฟล์ที่ต้องรู้)</h1>
+
+    <div class="info-grid">
+        <div class="detail-box">
+            <h3>สิ่งสำคัญที่ครอบคลุมโครงสร้างหลัก</h3>
+            <ul>
+                <li><strong>&lt;!DOCTYPE html&gt;</strong>: ไม่ใช่แท็ก HTML แต่เป็นคำสั่งบอกเบราว์เซอร์ว่า "นี่คือเอกสารมาตรฐาน HTML5 ตัวล่าสุดนะ" เพื่อป้องกันไม่ให้เบราว์เซอร์เข้าสู่โหมดประมวลผลเพี้ยนแบบยุคโบราณ (Quirks Mode)</li>
+                <li><strong>&lt;html&gt;</strong>: Root element หรือเปลือกนอกสุดที่คุมรหัสโค้ดทั้งหมด นิยมใส่แอตทริบิวต์ภาษาเช่น <code>lang="th"</code> เพื่อส่งสัญญาณให้โปรแกรมแปลภาษาและโปรแกรมช่วยอ่านหน้าจอมือถือรับทราบ</li>
+            </ul>
+        </div>
+        <div class="detail-box">
+            <h3>ส่วนข้อมูลหลังบ้าน และส่วนแสดงผล</h3>
+            <ul>
+                <li><strong>&lt;head&gt;</strong>: เป็นที่อยู่อาศัยของข้อมูลทางเทคนิคที่ <em>ไม่ปรากฏกายบนพื้นที่หน้าเว็บหลัก</em> เช่น การระบุชุดตัวอักษร <code>&lt;meta charset="UTF-8"&gt;</code>, การตั้งชื่อแถบแท็บบนเบราว์เซอร์ <code>&lt;title&gt;</code> และไฟล์ CSS ที่จะนำมาผูก</li>
+                <li><strong>&lt;body&gt;</strong>: กล่องเก็บวัตถุสิ่งของทุกชิ้นที่จะไปโผล่แสดงผลจริงแก่สายตาผู้ใช้งาน ไม่ว่าจะเป็นปุ่มกด ข้อความ ตาราง รูปภาพ หรือฟอร์มสมัครสมาชิก</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="sandbox">
+        <div class="sandbox-header">
+            <span style="font-family: monospace; color: #94a3b8;">โครงสร้างจำลอง (คุณลองลบคำหรือเติมแต่งโค้ดได้เลย)</span>
+            <button class="run-btn" onclick="executePreview()">Run โค้ดสด →</button>
+        </div>
+        <div class="sandbox-body">
+            <textarea id="code-editor"><!DOCTYPE html>
+<html lang="th">
+<head>
+    <title>หน้าต่างจำลองการเรียนรู้</title>
+</head>
+<body style="padding: 20px; font-family: sans-serif;">
+    <h2 style="color: #2563eb;">ยินดีต้อนรับเข้าสู่ระบบจัดการ</h2>
+    <p>ลองแก้ไขข้อความในกล่องสีดำซ้ายมือ แล้วกดปุ่ม Run สีเขียวด้านบนเพื่อดูการเปลี่ยนแปลงได้ทันที!</p>
+</body>
+</html></textarea>
+            <iframe id="live-preview"></iframe>
+        </div>
+    </div>
+
+    <script>
+        function executePreview() {
+            const rawCode = document.getElementById('code-editor').value;
+            const targetIframe = document.getElementById('live-preview');
+            const targetDoc = targetIframe.contentDocument || targetIframe.contentWindow.document;
+            targetDoc.open();
+            targetDoc.write(rawCode);
+            targetDoc.close();
+        }
+        window.onload = executePreview; // สั่งให้รันทันทีเมื่อหน้าเว็บโหลดเสร็จ
+    </script>
+</body>
+</html>
