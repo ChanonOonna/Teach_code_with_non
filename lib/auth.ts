@@ -6,7 +6,7 @@ import { prisma } from "./db";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
-const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || process.env.JWT_REFRESH_SECRET!;
 
 export interface JWTPayload {
   userId: string;
