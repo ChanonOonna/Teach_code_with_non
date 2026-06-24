@@ -225,6 +225,39 @@ async function main() {
       isPublished: true,
       estimatedHours: 18,
     },
+    {
+      slug: "docker-mastery",
+      title: "Docker Mastery: Basic to Advanced",
+      description: "เรียนรู้ Docker ตั้งแต่พื้นฐาน Container, Image, Dockerfile, Docker Compose จนถึงระดับ Advanced อย่างละเอียด",
+      language: "DEVOPS",
+      level: "BEGINNER",
+      order: 18,
+      isFeatured: true,
+      isPublished: true,
+      estimatedHours: 20,
+    },
+    {
+      slug: "kubernetes-mastery",
+      title: "Kubernetes: Container Orchestration",
+      description: "เรียนรู้ Kubernetes ตั้งแต่ Pods, Deployments, Services จนถึง Helm, RBAC และ Production Cluster",
+      language: "DEVOPS",
+      level: "INTERMEDIATE",
+      order: 19,
+      isFeatured: false,
+      isPublished: true,
+      estimatedHours: 25,
+    },
+    {
+      slug: "network-fundamentals",
+      title: "Computer Networking: Basic to Advanced",
+      description: "เรียนรู้ระบบเครือข่ายคอมพิวเตอร์ตั้งแต่ OSI Model, TCP/IP, DNS, HTTP จนถึง Network Security และ VPN",
+      language: "GENERAL",
+      level: "BEGINNER",
+      order: 20,
+      isFeatured: false,
+      isPublished: true,
+      estimatedHours: 22,
+    },
   ];
 
   for (const courseData of courses) {
@@ -304,6 +337,15 @@ async function main() {
 
   const flutterCourse = await prisma.course.findUnique({ where: { slug: "flutter-mobile" } });
   if (flutterCourse) await seedFlutterCourse(flutterCourse.id);
+
+  const dockerCourse = await prisma.course.findUnique({ where: { slug: "docker-mastery" } });
+  if (dockerCourse) await seedDockerCourse(dockerCourse.id);
+
+  const kubernetesCourse = await prisma.course.findUnique({ where: { slug: "kubernetes-mastery" } });
+  if (kubernetesCourse) await seedKubernetesCourse(kubernetesCourse.id);
+
+  const networkCourse = await prisma.course.findUnique({ where: { slug: "network-fundamentals" } });
+  if (networkCourse) await seedNetworkCourse(networkCourse.id);
 
   // Quiz questions (real)
   await seedQuizzes();
@@ -17896,6 +17938,2464 @@ class _CoursesScreenState extends State<CoursesScreen> {
       ]
     }
   ]);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DOCKER MASTERY
+// ─────────────────────────────────────────────────────────────────────────────
+async function seedDockerCourse(courseId: string) {
+  const sections = [
+    {
+      title: "บทที่ 1: Docker พื้นฐาน",
+      order: 1,
+      lessons: [
+        {
+          slug: "docker-what-is-container",
+          title: "Container คืออะไร? ทำไมต้องใช้ Docker",
+          isFree: true,
+          duration: 15,
+          content: `# Container คืออะไร?
+
+Container คือหน่วยของ software ที่รวม **โค้ด + dependencies + config** ทั้งหมดไว้ด้วยกัน ทำให้รันได้เหมือนกันทุกเครื่อง
+
+## ปัญหาที่ Docker แก้ได้
+- "ในเครื่องผมรันได้นะ" (It works on my machine)
+- ตั้งค่า environment ซ้ำทุกครั้ง
+- Version conflict ระหว่างโปรเจกต์
+
+## VM vs Container
+| VM | Container |
+|----|-----------|
+| OS เต็มๆ ทุก VM | แชร์ OS kernel |
+| หนัก (GBs) | เบา (MBs) |
+| บู๊ตช้า (นาที) | เริ่มเร็ว (วินาที) |
+
+## Docker Architecture
+\`\`\`
+Docker Client → Docker Daemon → Images / Containers / Networks / Volumes
+\`\`\`
+
+Docker Hub = registry สำหรับเก็บ images สาธารณะ`,
+          codeExamples: [
+            {
+              title: "ติดตั้ง Docker และทดสอบ",
+              language: "bash",
+              code: `# ตรวจสอบ Docker version
+docker --version
+docker info
+
+# รัน Hello World container
+docker run hello-world
+
+# ดู containers ที่รันอยู่
+docker ps
+
+# ดู containers ทั้งหมด (รวม stopped)
+docker ps -a`,
+              explanation: "คำสั่งพื้นฐานหลังติดตั้ง Docker"
+            }
+          ]
+        },
+        {
+          slug: "docker-images-basics",
+          title: "Docker Images คืออะไร และการใช้งาน",
+          isFree: true,
+          duration: 20,
+          content: `# Docker Images
+
+Image คือ **blueprint** ที่ใช้สร้าง Container เปรียบเหมือน class ที่ container เป็น instance
+
+## Image Layers
+Docker image ประกอบด้วย **layers** ซ้อนกัน แต่ละ instruction ใน Dockerfile สร้าง layer ใหม่
+ทำให้ประหยัด disk เพราะ layers ซ้ำกันแชร์กันได้
+
+## Image Naming
+\`\`\`
+registry/username/image:tag
+docker.io/library/nginx:latest
+ghcr.io/myuser/myapp:v1.2.0
+\`\`\`
+
+## Pull และ Run Image
+\`\`\`bash
+docker pull nginx:latest
+docker run -d -p 8080:80 nginx
+\`\`\`
+
+## Image Management
+\`\`\`bash
+docker images          # ดู images ทั้งหมด
+docker rmi nginx       # ลบ image
+docker image prune     # ลบ unused images
+\`\`\``,
+          codeExamples: [
+            {
+              title: "จัดการ Docker Images",
+              language: "bash",
+              code: `# Pull image จาก Docker Hub
+docker pull ubuntu:22.04
+docker pull node:20-alpine
+docker pull postgres:15
+
+# ดู images ที่มีอยู่
+docker images
+docker images --format "table {{.Repository}}\\t{{.Tag}}\\t{{.Size}}"
+
+# ดูข้อมูล image
+docker inspect ubuntu:22.04
+
+# ลบ images
+docker rmi ubuntu:22.04
+docker image prune -a  # ลบ images ที่ไม่ใช้`,
+              explanation: "คำสั่งจัดการ Docker Images"
+            }
+          ]
+        },
+        {
+          slug: "docker-containers-basics",
+          title: "Docker Containers: รัน จัดการ และหยุดใช้งาน",
+          isFree: false,
+          duration: 25,
+          content: `# Docker Containers
+
+Container คือ **running instance** ของ Image
+
+## Container Lifecycle
+\`\`\`
+Created → Running → Paused → Stopped → Removed
+\`\`\`
+
+## คำสั่งสำคัญ
+| คำสั่ง | หน้าที่ |
+|--------|---------|
+| \`docker run\` | สร้างและเริ่ม container |
+| \`docker start\` | เริ่ม container ที่หยุดไว้ |
+| \`docker stop\` | หยุด container อย่างนุ่มนวล |
+| \`docker kill\` | หยุด container ทันที |
+| \`docker rm\` | ลบ container |
+| \`docker exec\` | รันคำสั่งใน container |
+| \`docker logs\` | ดู logs |
+
+## Flags สำคัญของ \`docker run\`
+- \`-d\` = detached mode (รันเบื้องหลัง)
+- \`-p host:container\` = port mapping
+- \`-v\` = volume mount
+- \`--name\` = ตั้งชื่อ container
+- \`--rm\` = ลบ container หลัง stop
+- \`-e\` = environment variable
+- \`-it\` = interactive + TTY`,
+          codeExamples: [
+            {
+              title: "รันและจัดการ Containers",
+              language: "bash",
+              code: `# รัน Nginx web server
+docker run -d --name my-nginx -p 8080:80 nginx
+
+# ดู containers ที่รันอยู่
+docker ps
+
+# เข้าไปใน container
+docker exec -it my-nginx bash
+
+# ดู logs
+docker logs my-nginx
+docker logs -f my-nginx  # follow logs
+
+# หยุดและลบ container
+docker stop my-nginx
+docker rm my-nginx
+
+# รันแบบ interactive
+docker run -it --rm ubuntu:22.04 bash
+
+# รัน container พร้อม environment variables
+docker run -d \\
+  --name my-db \\
+  -e POSTGRES_PASSWORD=secret \\
+  -e POSTGRES_DB=mydb \\
+  -p 5432:5432 \\
+  postgres:15`,
+              explanation: "การรัน จัดการ และหยุด containers พื้นฐาน"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      title: "บทที่ 2: Dockerfile",
+      order: 2,
+      lessons: [
+        {
+          slug: "dockerfile-basics",
+          title: "เขียน Dockerfile พื้นฐาน",
+          isFree: false,
+          duration: 30,
+          content: `# Dockerfile
+
+Dockerfile คือ text file ที่มี **instructions** สำหรับสร้าง Docker Image
+
+## Instructions หลัก
+| Instruction | หน้าที่ |
+|-------------|---------|
+| \`FROM\` | base image |
+| \`WORKDIR\` | กำหนด working directory |
+| \`COPY\` | copy files จาก host |
+| \`ADD\` | เหมือน COPY แต่รองรับ URL และ tar |
+| \`RUN\` | รันคำสั่งตอน build |
+| \`CMD\` | คำสั่งเริ่มต้นเมื่อ container เริ่ม |
+| \`ENTRYPOINT\` | คำสั่งหลักของ container |
+| \`EXPOSE\` | บอก port ที่ใช้ |
+| \`ENV\` | กำหนด environment variable |
+| \`ARG\` | build argument |
+
+## Best Practices
+1. ใช้ alpine images เพื่อลด size
+2. รวม RUN instructions ด้วย \`&&\`
+3. ลบ cache หลัง install
+4. ใช้ .dockerignore`,
+          codeExamples: [
+            {
+              title: "Dockerfile สำหรับ Node.js App",
+              language: "dockerfile",
+              code: `# Dockerfile
+FROM node:20-alpine
+
+# กำหนด working directory
+WORKDIR /app
+
+# Copy package files ก่อน (cache layer)
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci --only=production
+
+# Copy source code
+COPY . .
+
+# Expose port
+EXPOSE 3000
+
+# Start command
+CMD ["node", "server.js"]`,
+              explanation: "Dockerfile พื้นฐานสำหรับ Node.js"
+            },
+            {
+              title: "Build และ Run Image",
+              language: "bash",
+              code: `# Build image
+docker build -t my-node-app:1.0 .
+
+# Build พร้อม build args
+docker build --build-arg NODE_ENV=production -t my-app .
+
+# ดูขั้นตอน build
+docker build --progress=plain -t my-app .
+
+# Run container จาก image ที่สร้าง
+docker run -d -p 3000:3000 --name my-app my-node-app:1.0
+
+# ดู image size
+docker images my-node-app`,
+              explanation: "Build image จาก Dockerfile"
+            }
+          ]
+        },
+        {
+          slug: "dockerfile-multi-stage",
+          title: "Multi-stage Builds: ลด Image Size",
+          isFree: false,
+          duration: 25,
+          content: `# Multi-stage Builds
+
+เทคนิคที่ทำให้ production image **เล็กลงมาก** โดยแยก build stage กับ runtime stage
+
+## ทำไมต้องใช้?
+- Build tools (compiler, npm) ไม่จำเป็นใน production
+- ลด attack surface
+- Image เล็กลงได้ 10x+
+
+## ตัวอย่าง: Go App
+\`\`\`
+Builder stage: golang:1.21 (1.2GB) → binary
+Final stage:   alpine (5MB) + binary = 10MB total
+\`\`\`
+
+## .dockerignore
+ช่วยลด build context ส่งไปยัง daemon:
+\`\`\`
+node_modules
+.git
+*.log
+.env
+dist
+\`\`\``,
+          codeExamples: [
+            {
+              title: "Multi-stage สำหรับ Next.js",
+              language: "dockerfile",
+              code: `# Stage 1: Dependencies
+FROM node:20-alpine AS deps
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+
+# Stage 2: Builder
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npm run build
+
+# Stage 3: Production runner
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+EXPOSE 3000
+ENV PORT 3000
+
+CMD ["node", "server.js"]`,
+              explanation: "Multi-stage build ลด image size สำหรับ Next.js"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      title: "บทที่ 3: Docker Volumes และ Networking",
+      order: 3,
+      lessons: [
+        {
+          slug: "docker-volumes",
+          title: "Docker Volumes: จัดการ Data ใน Container",
+          isFree: false,
+          duration: 25,
+          content: `# Docker Volumes
+
+Container เป็น **stateless** — ข้อมูลหายเมื่อลบ container
+Volume แก้ปัญหานี้โดยเก็บข้อมูลไว้นอก container
+
+## ประเภท Storage ใน Docker
+1. **Volumes** — Docker จัดการ (\`/var/lib/docker/volumes/\`)
+2. **Bind Mounts** — map directory จาก host
+3. **tmpfs Mounts** — เก็บใน memory (Linux เท่านั้น)
+
+## เมื่อไหร่ใช้อะไร?
+- **Volume**: database, persistent data (แนะนำสุด)
+- **Bind Mount**: development, hot reload
+- **tmpfs**: sensitive data ที่ไม่ต้องการ persist`,
+          codeExamples: [
+            {
+              title: "ใช้งาน Volumes",
+              language: "bash",
+              code: `# สร้าง named volume
+docker volume create my-data
+
+# ดู volumes
+docker volume ls
+docker volume inspect my-data
+
+# Mount volume เข้า container
+docker run -d \\
+  --name postgres-db \\
+  -v my-data:/var/lib/postgresql/data \\
+  -e POSTGRES_PASSWORD=secret \\
+  postgres:15
+
+# Bind mount สำหรับ development
+docker run -d \\
+  --name dev-app \\
+  -v $(pwd):/app \\
+  -p 3000:3000 \\
+  node:20-alpine \\
+  npm run dev
+
+# ลบ volume
+docker volume rm my-data
+docker volume prune  # ลบ unused volumes`,
+              explanation: "การใช้ Volumes และ Bind Mounts"
+            }
+          ]
+        },
+        {
+          slug: "docker-networking",
+          title: "Docker Networking: เชื่อมต่อ Containers",
+          isFree: false,
+          duration: 25,
+          content: `# Docker Networking
+
+Containers สื่อสารกันผ่าน **Docker Networks**
+
+## Network Drivers
+| Driver | ใช้เมื่อ |
+|--------|---------|
+| \`bridge\` | default, containers บน host เดียว |
+| \`host\` | ไม่ isolate network (Linux) |
+| \`none\` | ไม่มี network |
+| \`overlay\` | Docker Swarm หลาย hosts |
+
+## Default Bridge vs Custom Bridge
+- Default bridge: communicate ด้วย IP เท่านั้น
+- Custom bridge: communicate ด้วย **container name** ได้ (DNS)
+
+## Port Mapping
+\`\`\`
+-p host_port:container_port
+-p 8080:80        # host:8080 → container:80
+-p 127.0.0.1:80:80  # bind เฉพาะ localhost
+\`\`\``,
+          codeExamples: [
+            {
+              title: "Custom Networks",
+              language: "bash",
+              code: `# สร้าง custom network
+docker network create my-network
+
+# รัน containers ใน network เดียวกัน
+docker run -d \\
+  --name backend \\
+  --network my-network \\
+  my-backend-image
+
+docker run -d \\
+  --name frontend \\
+  --network my-network \\
+  -p 3000:3000 \\
+  my-frontend-image
+
+# frontend เชื่อมต่อ backend ด้วย hostname "backend"
+# http://backend:5000/api
+
+# ดู networks
+docker network ls
+docker network inspect my-network
+
+# เชื่อม container เข้า network หลังสร้าง
+docker network connect my-network existing-container`,
+              explanation: "สร้าง network และเชื่อมต่อ containers"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      title: "บทที่ 4: Docker Compose",
+      order: 4,
+      lessons: [
+        {
+          slug: "docker-compose-intro",
+          title: "Docker Compose: รัน Multi-Container App",
+          isFree: false,
+          duration: 30,
+          content: `# Docker Compose
+
+Tool สำหรับ **define และ run multi-container** applications ด้วยไฟล์ YAML เดียว
+
+## ทำไมต้องใช้?
+แทนที่จะรันคำสั่ง docker run ยาวๆ หลายตัว ใช้ \`docker-compose.yml\` ไฟล์เดียว
+
+## Structure ของ docker-compose.yml
+\`\`\`yaml
+version: "3.9"
+
+services:        # containers ที่จะรัน
+  web:
+    image: nginx
+    ports:
+      - "80:80"
+
+networks:        # custom networks
+volumes:         # named volumes
+\`\`\`
+
+## คำสั่งสำคัญ
+| คำสั่ง | หน้าที่ |
+|--------|---------|
+| \`docker compose up\` | สร้างและเริ่ม services |
+| \`docker compose up -d\` | รันเบื้องหลัง |
+| \`docker compose down\` | หยุดและลบ containers |
+| \`docker compose logs\` | ดู logs |
+| \`docker compose ps\` | ดู status |
+| \`docker compose exec\` | รันคำสั่งใน service |
+| \`docker compose build\` | build images |`,
+          codeExamples: [
+            {
+              title: "docker-compose.yml สำหรับ Full-Stack App",
+              language: "yaml",
+              code: `version: "3.9"
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: myapp
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - backend-net
+
+  # Node.js Backend API
+  api:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: postgresql://admin:secret@db:5432/myapp
+      NODE_ENV: development
+    depends_on:
+      - db
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - backend-net
+      - frontend-net
+
+  # Next.js Frontend
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:5000
+    depends_on:
+      - api
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - frontend-net
+
+networks:
+  backend-net:
+  frontend-net:
+
+volumes:
+  postgres-data:`,
+              explanation: "docker-compose.yml สำหรับ Full-Stack application"
+            },
+            {
+              title: "รัน Docker Compose",
+              language: "bash",
+              code: `# รัน services ทั้งหมด
+docker compose up -d
+
+# ดู logs ทุก services
+docker compose logs -f
+
+# ดู logs เฉพาะ service
+docker compose logs -f api
+
+# ดู status
+docker compose ps
+
+# หยุดทั้งหมด
+docker compose down
+
+# หยุดและลบ volumes ด้วย
+docker compose down -v
+
+# Build ใหม่ทั้งหมด
+docker compose up -d --build`,
+              explanation: "คำสั่ง Docker Compose พื้นฐาน"
+            }
+          ]
+        },
+        {
+          slug: "docker-compose-advanced",
+          title: "Docker Compose Advanced: Health Checks, Secrets, Profiles",
+          isFree: false,
+          duration: 25,
+          content: `# Docker Compose Advanced
+
+## Health Checks
+ตรวจสอบว่า service พร้อมรับ traffic หรือยัง
+
+\`\`\`yaml
+healthcheck:
+  test: ["CMD", "curl", "-f", "http://localhost/health"]
+  interval: 30s
+  timeout: 10s
+  retries: 3
+  start_period: 40s
+\`\`\`
+
+## depends_on + condition
+\`\`\`yaml
+api:
+  depends_on:
+    db:
+      condition: service_healthy
+\`\`\`
+
+## Profiles
+แยก services ตาม environment:
+\`\`\`yaml
+services:
+  dev-tools:
+    profiles: ["dev"]
+  monitoring:
+    profiles: ["monitoring"]
+\`\`\`
+
+\`\`\`bash
+docker compose --profile dev up
+\`\`\`
+
+## Secrets
+เก็บ sensitive data ไม่ให้อยู่ใน environment:
+\`\`\`yaml
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
+\`\`\``,
+          codeExamples: [
+            {
+              title: "Production-ready docker-compose.yml",
+              language: "yaml",
+              code: `version: "3.9"
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_DB: myapp
+    secrets:
+      - db_password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+      target: production
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+    secrets:
+      - db_password
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - certbot-etc:/etc/letsencrypt
+    depends_on:
+      - api
+
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
+
+volumes:
+  postgres-data:
+  certbot-etc:`,
+              explanation: "Production docker-compose.yml พร้อม health checks และ secrets"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      title: "บทที่ 5: Docker Registry และ Production",
+      order: 5,
+      lessons: [
+        {
+          slug: "docker-registry",
+          title: "Docker Registry: Push และ Pull Images",
+          isFree: false,
+          duration: 20,
+          content: `# Docker Registry
+
+Registry คือ **ที่เก็บ Docker images** ให้ทีมและ CI/CD ใช้ร่วมกัน
+
+## Registry ยอดนิยม
+| Registry | ลักษณะ |
+|----------|--------|
+| Docker Hub | Public, ฟรีสำหรับ public images |
+| GitHub Container Registry (GHCR) | ฟรีสำหรับ public repos |
+| AWS ECR | สำหรับ AWS ECS/EKS |
+| Google Artifact Registry | สำหรับ GCP |
+| Self-hosted Registry | ควบคุมเองทั้งหมด |
+
+## Tagging Convention
+\`\`\`
+image:latest          # อันล่าสุด (ไม่แนะนำใน production)
+image:v1.2.3          # semantic version
+image:git-abc1234     # git commit hash
+image:2024-01-15      # date
+\`\`\``,
+          codeExamples: [
+            {
+              title: "Push Image ไปยัง Docker Hub",
+              language: "bash",
+              code: `# Login ไปยัง Docker Hub
+docker login
+
+# Tag image ก่อน push
+docker tag my-app:local username/my-app:v1.0.0
+docker tag my-app:local username/my-app:latest
+
+# Push
+docker push username/my-app:v1.0.0
+docker push username/my-app:latest
+
+# Pull image
+docker pull username/my-app:v1.0.0
+
+# Login ไปยัง GitHub Container Registry
+echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
+docker tag my-app ghcr.io/USERNAME/my-app:latest
+docker push ghcr.io/USERNAME/my-app:latest`,
+              explanation: "Push และ Pull images จาก registries"
+            },
+            {
+              title: "Self-hosted Registry",
+              language: "bash",
+              code: `# รัน private registry ด้วย Docker
+docker run -d \\
+  --name registry \\
+  -p 5000:5000 \\
+  -v registry-data:/var/lib/registry \\
+  registry:2
+
+# Push image ไปยัง local registry
+docker tag my-app localhost:5000/my-app:v1.0
+docker push localhost:5000/my-app:v1.0
+
+# Pull จาก local registry
+docker pull localhost:5000/my-app:v1.0`,
+              explanation: "รัน private Docker registry"
+            }
+          ]
+        },
+        {
+          slug: "docker-production-tips",
+          title: "Docker ใน Production: Security และ Best Practices",
+          isFree: false,
+          duration: 30,
+          content: `# Docker ใน Production
+
+## Security Best Practices
+1. **อย่ารัน container เป็น root** — ใช้ USER instruction
+2. **ใช้ specific tags** — ไม่ใช้ :latest ใน production
+3. **Scan images** — ใช้ \`docker scout\` หรือ Trivy
+4. **Read-only filesystem** — \`--read-only\` flag
+5. **Limit resources** — CPU และ memory limits
+6. **Secrets management** — Docker secrets หรือ Vault
+
+## Resource Limits
+\`\`\`bash
+docker run -d \\
+  --memory="512m" \\
+  --cpus="0.5" \\
+  my-app
+\`\`\`
+
+## Logging
+\`\`\`bash
+docker run -d \\
+  --log-driver=json-file \\
+  --log-opt max-size=10m \\
+  --log-opt max-file=3 \\
+  my-app
+\`\`\`
+
+## Container Security Scanning
+\`\`\`bash
+# Trivy scan
+trivy image my-app:latest
+
+# Docker Scout
+docker scout cves my-app:latest
+\`\`\`
+
+## Image Optimization Checklist
+- [ ] ใช้ alpine/slim base images
+- [ ] Multi-stage builds
+- [ ] .dockerignore ครบ
+- [ ] ลบ package manager cache
+- [ ] Non-root user
+- [ ] Specific version tags`,
+          codeExamples: [
+            {
+              title: "Production-ready Dockerfile",
+              language: "dockerfile",
+              code: `FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+# Security: ไม่ใช้ root user
+RUN addgroup -g 1001 -S nodejs && \\
+    adduser -S nextjs -u 1001
+
+# Copy built files
+COPY --from=builder --chown=nextjs:nodejs /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY package.json ./
+
+# Switch to non-root user
+USER nextjs
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s \\
+  CMD node -e "require('http').get('http://localhost:3000/health', r => r.statusCode === 200 ? process.exit(0) : process.exit(1))"
+
+EXPOSE 3000
+CMD ["node", "dist/server.js"]`,
+              explanation: "Production Dockerfile พร้อม security best practices"
+            }
+          ]
+        }
+      ]
+    }
+  ];
+
+  await seedCourse(courseId, "Docker Mastery", sections);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// KUBERNETES MASTERY
+// ─────────────────────────────────────────────────────────────────────────────
+async function seedKubernetesCourse(courseId: string) {
+  const sections = [
+    {
+      title: "บทที่ 1: Kubernetes พื้นฐาน",
+      order: 1,
+      lessons: [
+        {
+          slug: "k8s-what-is-kubernetes",
+          title: "Kubernetes คืออะไร? ทำไมถึงจำเป็น",
+          isFree: true,
+          duration: 15,
+          content: `# Kubernetes (K8s) คืออะไร?
+
+Kubernetes คือ **Container Orchestration** platform ที่ Google สร้างขึ้น (open source 2014)
+ช่วยจัดการ containers จำนวนมากใน production อย่างอัตโนมัติ
+
+## ปัญหาที่ Kubernetes แก้
+- รัน containers หลายพัน instances
+- Auto-healing เมื่อ container crash
+- Auto-scaling ตาม load
+- Zero-downtime deployment (rolling update)
+- Load balancing อัตโนมัติ
+- Service discovery
+- Config และ Secrets management
+
+## Kubernetes Architecture
+
+### Control Plane (Master)
+- **API Server**: จุดศูนย์กลาง ทุก request ผ่านที่นี่
+- **etcd**: database เก็บ cluster state
+- **Scheduler**: เลือก Node ให้ Pod
+- **Controller Manager**: loop ดูแล desired state
+
+### Worker Nodes
+- **kubelet**: agent บน node ดูแล pods
+- **kube-proxy**: network rules
+- **Container Runtime**: Docker, containerd, CRI-O`,
+          codeExamples: [
+            {
+              title: "ติดตั้ง kubectl และ minikube",
+              language: "bash",
+              code: `# ติดตั้ง kubectl (Linux)
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+
+# ติดตั้ง minikube (local development)
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+
+# เริ่ม cluster
+minikube start
+
+# ตรวจสอบ cluster
+kubectl cluster-info
+kubectl get nodes
+kubectl get all --all-namespaces`,
+              explanation: "ติดตั้ง tools สำหรับ Kubernetes development"
+            }
+          ]
+        },
+        {
+          slug: "k8s-pods",
+          title: "Pods: หน่วยเล็กที่สุดของ Kubernetes",
+          isFree: true,
+          duration: 25,
+          content: `# Kubernetes Pods
+
+Pod คือ **smallest deployable unit** ใน Kubernetes
+Pod = group ของ containers ที่รันด้วยกัน แชร์ network และ storage
+
+## Pod ≠ Container
+- Pod อาจมีหลาย containers (sidecar pattern)
+- Containers ใน Pod เดียวกัน communicate ผ่าน localhost
+- Pod มี IP เดียว shared กันทุก containers
+
+## Pod Lifecycle
+\`\`\`
+Pending → Running → Succeeded/Failed
+\`\`\`
+
+## Restart Policy
+- \`Always\` (default): restart เสมอ
+- \`OnFailure\`: restart เฉพาะเมื่อ fail
+- \`Never\`: ไม่ restart
+
+## Pod YAML Structure
+\`\`\`yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+  labels:
+    app: my-app
+spec:
+  containers:
+  - name: main
+    image: nginx:alpine
+    ports:
+    - containerPort: 80
+\`\`\``,
+          codeExamples: [
+            {
+              title: "สร้างและจัดการ Pods",
+              language: "bash",
+              code: `# สร้าง Pod จาก YAML
+kubectl apply -f pod.yaml
+
+# ดู pods
+kubectl get pods
+kubectl get pods -o wide  # ดู IP และ Node
+
+# ดูรายละเอียด Pod
+kubectl describe pod my-pod
+
+# ดู logs
+kubectl logs my-pod
+kubectl logs -f my-pod  # follow
+
+# exec เข้าไปใน pod
+kubectl exec -it my-pod -- bash
+
+# ลบ pod
+kubectl delete pod my-pod
+kubectl delete -f pod.yaml
+
+# Port forward (สำหรับ test)
+kubectl port-forward pod/my-pod 8080:80`,
+              explanation: "kubectl คำสั่งสำหรับจัดการ Pods"
+            }
+          ]
+        },
+        {
+          slug: "k8s-deployments",
+          title: "Deployments: จัดการ Pods อย่างมีระบบ",
+          isFree: false,
+          duration: 30,
+          content: `# Kubernetes Deployments
+
+Deployment คือ higher-level object ที่จัดการ **ReplicaSet** และ **Pods**
+
+## ทำไมใช้ Deployment แทน Pod ตรงๆ?
+- **Self-healing**: Pod crash → สร้างใหม่อัตโนมัติ
+- **Scaling**: เพิ่ม/ลด replicas ได้ง่าย
+- **Rolling Update**: update โดยไม่ downtime
+- **Rollback**: ย้อนกลับ version ได้
+
+## Deployment → ReplicaSet → Pods
+\`\`\`
+Deployment
+  └── ReplicaSet (v1)
+        ├── Pod
+        ├── Pod
+        └── Pod
+\`\`\`
+
+## Update Strategies
+- **RollingUpdate** (default): ค่อยๆ เปลี่ยน pod ทีละชุด
+- **Recreate**: หยุดทั้งหมดก่อน แล้วสร้างใหม่ (มี downtime)`,
+          codeExamples: [
+            {
+              title: "Deployment YAML",
+              language: "yaml",
+              code: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+  labels:
+    app: my-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: my-app
+        image: my-app:v1.0
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 15
+          periodSeconds: 20`,
+              explanation: "Production-ready Deployment YAML"
+            },
+            {
+              title: "จัดการ Deployments",
+              language: "bash",
+              code: `# Apply deployment
+kubectl apply -f deployment.yaml
+
+# ดู deployments
+kubectl get deployments
+kubectl rollout status deployment/my-app
+
+# Scale
+kubectl scale deployment my-app --replicas=5
+
+# Update image
+kubectl set image deployment/my-app my-app=my-app:v2.0
+
+# ดู rollout history
+kubectl rollout history deployment/my-app
+
+# Rollback
+kubectl rollout undo deployment/my-app
+kubectl rollout undo deployment/my-app --to-revision=2`,
+              explanation: "คำสั่งจัดการ Deployments"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      title: "บทที่ 2: Services และ Ingress",
+      order: 2,
+      lessons: [
+        {
+          slug: "k8s-services",
+          title: "Services: Expose Pods ให้เข้าถึงได้",
+          isFree: false,
+          duration: 25,
+          content: `# Kubernetes Services
+
+Service คือ **stable endpoint** สำหรับเข้าถึง Pods
+Pods มี IP เปลี่ยนได้ตลอด แต่ Service IP คงที่
+
+## Service Types
+| Type | ใช้เมื่อ |
+|------|---------|
+| **ClusterIP** | internal เท่านั้น (default) |
+| **NodePort** | เข้าถึงจากภายนอกผ่าน node IP:port |
+| **LoadBalancer** | สร้าง cloud load balancer |
+| **ExternalName** | map ไปยัง DNS name ภายนอก |
+
+## DNS ใน Kubernetes
+\`\`\`
+<service-name>.<namespace>.svc.cluster.local
+my-api.default.svc.cluster.local
+\`\`\`
+
+Service ทำหน้าที่ **load balance** ระหว่าง pods ที่ match labels`,
+          codeExamples: [
+            {
+              title: "Service YAML",
+              language: "yaml",
+              code: `# ClusterIP Service (internal)
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-api
+spec:
+  type: ClusterIP
+  selector:
+    app: my-app
+  ports:
+  - port: 80
+    targetPort: 3000
+
+---
+# NodePort Service (external access)
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-api-external
+spec:
+  type: NodePort
+  selector:
+    app: my-app
+  ports:
+  - port: 80
+    targetPort: 3000
+    nodePort: 30080  # 30000-32767
+
+---
+# LoadBalancer (cloud)
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-api-lb
+spec:
+  type: LoadBalancer
+  selector:
+    app: my-app
+  ports:
+  - port: 80
+    targetPort: 3000`,
+              explanation: "Service Types ต่างๆ ใน Kubernetes"
+            }
+          ]
+        },
+        {
+          slug: "k8s-ingress",
+          title: "Ingress: HTTP Routing และ SSL",
+          isFree: false,
+          duration: 25,
+          content: `# Kubernetes Ingress
+
+Ingress จัดการ **HTTP/HTTPS traffic** เข้า cluster
+- URL-based routing
+- SSL termination
+- Name-based virtual hosting
+
+## ต้องมี Ingress Controller ก่อน
+- **nginx-ingress** (ยอดนิยม)
+- **traefik**
+- **AWS ALB Ingress Controller**
+
+## Ingress vs Service LoadBalancer
+- LoadBalancer: 1 IP = 1 Service (แพง)
+- Ingress: 1 IP = หลาย Services ตาม path/host
+
+## Path Types
+- \`Prefix\`: /api → /api, /api/users
+- \`Exact\`: /api → /api เท่านั้น`,
+          codeExamples: [
+            {
+              title: "Ingress YAML พร้อม TLS",
+              language: "yaml",
+              code: `apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - myapp.example.com
+    secretName: myapp-tls
+  rules:
+  - host: myapp.example.com
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: api-service
+            port:
+              number: 80
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 80`,
+              explanation: "Ingress routing พร้อม TLS certificate"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      title: "บทที่ 3: ConfigMaps, Secrets และ Storage",
+      order: 3,
+      lessons: [
+        {
+          slug: "k8s-configmaps-secrets",
+          title: "ConfigMaps และ Secrets: จัดการ Configuration",
+          isFree: false,
+          duration: 25,
+          content: `# ConfigMaps และ Secrets
+
+## ConfigMap
+เก็บ **non-sensitive config** เช่น URLs, feature flags
+
+\`\`\`yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  APP_URL: "https://myapp.com"
+  LOG_LEVEL: "info"
+  config.json: |
+    {
+      "timeout": 30,
+      "retries": 3
+    }
+\`\`\`
+
+## Secret
+เก็บ **sensitive data** (base64 encoded)
+
+\`\`\`yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secrets
+type: Opaque
+data:
+  DB_PASSWORD: c2VjcmV0  # base64("secret")
+  API_KEY: bXlhcGlrZXk=
+\`\`\`
+
+## Inject ใน Pod
+1. **Environment Variables**
+2. **Volume Mounts** (เหมาะกับ config files)`,
+          codeExamples: [
+            {
+              title: "ใช้ ConfigMap และ Secret ใน Pod",
+              language: "yaml",
+              code: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+spec:
+  template:
+    spec:
+      containers:
+      - name: my-app
+        image: my-app:v1.0
+        # จาก ConfigMap เป็น env vars
+        envFrom:
+        - configMapRef:
+            name: app-config
+        # จาก Secret เป็น env vars
+        - secretRef:
+            name: app-secrets
+        # หรือ inject ทีละตัว
+        env:
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: DB_HOST
+        # Mount config file
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/config
+      volumes:
+      - name: config-volume
+        configMap:
+          name: app-config`,
+              explanation: "Inject ConfigMap และ Secret เข้า Pod"
+            },
+            {
+              title: "จัดการ ConfigMaps และ Secrets",
+              language: "bash",
+              code: `# สร้าง ConfigMap
+kubectl create configmap app-config \\
+  --from-literal=APP_URL=https://myapp.com \\
+  --from-file=config.json
+
+# สร้าง Secret
+kubectl create secret generic app-secrets \\
+  --from-literal=DB_PASSWORD=mysecretpassword
+
+# ดู secrets (base64)
+kubectl get secret app-secrets -o yaml
+
+# Decode secret
+kubectl get secret app-secrets -o jsonpath='{.data.DB_PASSWORD}' | base64 -d`,
+              explanation: "คำสั่งจัดการ ConfigMaps และ Secrets"
+            }
+          ]
+        },
+        {
+          slug: "k8s-persistent-storage",
+          title: "Persistent Storage: PV, PVC, StorageClass",
+          isFree: false,
+          duration: 25,
+          content: `# Kubernetes Persistent Storage
+
+## Concepts
+- **PersistentVolume (PV)**: storage ที่ provisioned แล้ว
+- **PersistentVolumeClaim (PVC)**: request storage จาก pod
+- **StorageClass**: dynamic provisioning
+
+## Static vs Dynamic Provisioning
+- **Static**: admin สร้าง PV → pod claim ผ่าน PVC
+- **Dynamic**: StorageClass สร้าง PV อัตโนมัติเมื่อมี PVC
+
+## Access Modes
+| Mode | ความหมาย |
+|------|---------|
+| ReadWriteOnce (RWO) | node เดียว read/write |
+| ReadOnlyMany (ROX) | หลาย nodes read-only |
+| ReadWriteMany (RWX) | หลาย nodes read/write |
+
+## Reclaim Policies
+- **Retain**: ข้อมูลยังอยู่หลัง PVC ถูกลบ
+- **Delete**: ลบ storage พร้อม PVC
+- **Recycle**: ล้างข้อมูลแล้ว reuse`,
+          codeExamples: [
+            {
+              title: "PVC สำหรับ Database",
+              language: "yaml",
+              code: `# PersistentVolumeClaim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+# Deployment ใช้ PVC
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: postgres-pvc`,
+              explanation: "PVC สำหรับ PostgreSQL database"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      title: "บทที่ 4: Advanced Kubernetes",
+      order: 4,
+      lessons: [
+        {
+          slug: "k8s-namespaces-rbac",
+          title: "Namespaces และ RBAC: Multi-tenancy",
+          isFree: false,
+          duration: 25,
+          content: `# Namespaces และ RBAC
+
+## Namespaces
+แบ่ง cluster ออกเป็น **virtual clusters**
+
+Default namespaces:
+- \`default\` — สำหรับ resources ที่ไม่ระบุ namespace
+- \`kube-system\` — Kubernetes system components
+- \`kube-public\` — public resources
+- \`kube-node-lease\` — node heartbeats
+
+## RBAC (Role-Based Access Control)
+
+4 objects หลัก:
+1. **Role** — permissions ใน namespace เดียว
+2. **ClusterRole** — permissions ทั้ง cluster
+3. **RoleBinding** — bind Role ให้ user/group/serviceaccount
+4. **ClusterRoleBinding** — bind ClusterRole
+
+## Principle of Least Privilege
+ให้ access เท่าที่จำเป็นเท่านั้น`,
+          codeExamples: [
+            {
+              title: "RBAC สำหรับ Developer",
+              language: "yaml",
+              code: `# สร้าง namespace สำหรับทีม
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: team-backend
+
+---
+# Role: developer สามารถ read/write pods, deployments
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: team-backend
+  name: developer
+rules:
+- apiGroups: ["", "apps"]
+  resources: ["pods", "deployments", "services", "configmaps"]
+  verbs: ["get", "list", "watch", "create", "update", "patch"]
+- apiGroups: [""]
+  resources: ["pods/log"]
+  verbs: ["get", "list"]
+
+---
+# RoleBinding: bind developer role ให้ user john
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: developer-binding
+  namespace: team-backend
+subjects:
+- kind: User
+  name: john
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: developer
+  apiGroup: rbac.authorization.k8s.io`,
+              explanation: "RBAC สำหรับ developer access control"
+            }
+          ]
+        },
+        {
+          slug: "k8s-helm",
+          title: "Helm: Package Manager สำหรับ Kubernetes",
+          isFree: false,
+          duration: 30,
+          content: `# Helm
+
+Helm คือ **package manager** สำหรับ Kubernetes เหมือน npm สำหรับ Node.js
+ช่วยจัดการ Kubernetes manifests ที่ซับซ้อนได้ง่ายขึ้น
+
+## Concepts
+- **Chart**: package ของ Kubernetes resources
+- **Repository**: ที่เก็บ charts
+- **Release**: instance ของ chart ที่ installed
+- **values.yaml**: configuration สำหรับ chart
+
+## Helm 3 (ไม่มี Tiller แล้ว)
+Helm 3 ปลอดภัยกว่า ไม่ต้อง server-side component
+
+## ทำไมใช้ Helm?
+- ไม่ต้อง copy-paste YAML หลายสิบไฟล์
+- Version control สำหรับ deployments
+- Rollback ง่าย
+- Template engine สำหรับ reuse`,
+          codeExamples: [
+            {
+              title: "Helm Commands",
+              language: "bash",
+              code: `# ติดตั้ง Helm
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+# เพิ่ม repository
+helm repo add stable https://charts.helm.sh/stable
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+
+# ค้นหา chart
+helm search repo nginx
+helm search hub wordpress
+
+# Install chart
+helm install my-nginx bitnami/nginx
+helm install my-postgres bitnami/postgresql \\
+  --set auth.postgresPassword=mypassword \\
+  --set primary.persistence.size=20Gi
+
+# ดู releases
+helm list
+helm status my-nginx
+
+# Upgrade
+helm upgrade my-nginx bitnami/nginx --set replicaCount=3
+
+# Rollback
+helm rollback my-nginx 1
+
+# Uninstall
+helm uninstall my-nginx`,
+              explanation: "Helm commands พื้นฐาน"
+            },
+            {
+              title: "สร้าง Helm Chart ของตัวเอง",
+              language: "bash",
+              code: `# สร้าง chart ใหม่
+helm create my-app
+
+# โครงสร้าง:
+# my-app/
+#   Chart.yaml          # metadata
+#   values.yaml         # default values
+#   templates/
+#     deployment.yaml   # template
+#     service.yaml
+#     ingress.yaml
+#     _helpers.tpl      # template helpers
+
+# values.yaml
+cat my-app/values.yaml
+
+# Render templates (ไม่ deploy)
+helm template my-app ./my-app
+
+# Install จาก local chart
+helm install my-release ./my-app
+
+# Install พร้อม custom values
+helm install my-release ./my-app \\
+  --values custom-values.yaml \\
+  --set image.tag=v2.0`,
+              explanation: "สร้างและใช้ custom Helm chart"
+            }
+          ]
+        },
+        {
+          slug: "k8s-hpa-monitoring",
+          title: "HPA, Resource Management และ Monitoring",
+          isFree: false,
+          duration: 30,
+          content: `# Auto-scaling และ Monitoring
+
+## Horizontal Pod Autoscaler (HPA)
+Scale pods อัตโนมัติตาม CPU/memory หรือ custom metrics
+
+\`\`\`yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: my-app-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: my-app
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+\`\`\`
+
+## Vertical Pod Autoscaler (VPA)
+ปรับ resources requests/limits อัตโนมัติ
+
+## Monitoring Stack
+- **Prometheus**: metrics collection
+- **Grafana**: visualization
+- **Alertmanager**: alerts
+
+## kubectl top
+\`\`\`bash
+kubectl top nodes
+kubectl top pods
+\`\`\``,
+          codeExamples: [
+            {
+              title: "ติดตั้ง Prometheus + Grafana",
+              language: "bash",
+              code: `# เพิ่ม helm repo
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+
+# ติดตั้ง kube-prometheus-stack
+helm install monitoring prometheus-community/kube-prometheus-stack \\
+  --namespace monitoring \\
+  --create-namespace \\
+  --set grafana.adminPassword=admin123
+
+# ดู pods ที่ monitoring namespace
+kubectl get pods -n monitoring
+
+# Port-forward เข้า Grafana
+kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
+
+# Port-forward เข้า Prometheus
+kubectl port-forward -n monitoring svc/monitoring-kube-prometheus-prometheus 9090:9090`,
+              explanation: "ติดตั้ง monitoring stack ด้วย Helm"
+            }
+          ]
+        }
+      ]
+    }
+  ];
+
+  await seedCourse(courseId, "Kubernetes Mastery", sections);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COMPUTER NETWORKING
+// ─────────────────────────────────────────────────────────────────────────────
+async function seedNetworkCourse(courseId: string) {
+  const sections = [
+    {
+      title: "บทที่ 1: พื้นฐานระบบเครือข่าย",
+      order: 1,
+      lessons: [
+        {
+          slug: "network-what-is-network",
+          title: "ระบบเครือข่ายคืออะไร? LAN, WAN, Internet",
+          isFree: true,
+          duration: 15,
+          content: `# ระบบเครือข่ายคอมพิวเตอร์
+
+Network คือการเชื่อมต่อ **devices หลายชิ้น** เพื่อแลกเปลี่ยนข้อมูลกัน
+
+## ประเภทของเครือข่าย
+| ประเภท | ย่อมาจาก | ขนาด |
+|--------|---------|------|
+| **PAN** | Personal Area Network | รอบตัวเรา (Bluetooth) |
+| **LAN** | Local Area Network | บ้าน/ออฟฟิศ |
+| **MAN** | Metropolitan Area Network | เมือง |
+| **WAN** | Wide Area Network | ประเทศ/โลก |
+| **Internet** | Interconnected Networks | ทั่วโลก |
+
+## Network Topology (รูปแบบการเชื่อมต่อ)
+- **Star**: ทุก device เชื่อมกับ central switch
+- **Bus**: devices เชื่อมกับสายเดียว
+- **Ring**: devices เชื่อมเป็นวงกลม
+- **Mesh**: devices เชื่อมกันทุกคู่
+- **Hybrid**: ผสมหลายแบบ
+
+## Network Devices
+- **Hub**: ส่งต่อทุก packet ไปทุก port (เก่าแล้ว)
+- **Switch**: ส่งต่อ packet ตาม MAC address
+- **Router**: เชื่อม networks ต่างกัน routing ตาม IP
+- **Firewall**: กรอง traffic ตาม rules
+- **AP (Access Point)**: WiFi`,
+          codeExamples: [
+            {
+              title: "ตรวจสอบ Network ด้วย Command Line",
+              language: "bash",
+              code: `# ดู network interfaces
+ip addr show         # Linux
+ipconfig             # Windows
+
+# ดู routing table
+ip route show        # Linux
+route print          # Windows
+
+# Ping test
+ping google.com
+ping -c 4 8.8.8.8   # Linux (4 packets)
+
+# Traceroute
+traceroute google.com    # Linux
+tracert google.com       # Windows
+
+# DNS lookup
+nslookup google.com
+dig google.com
+
+# ดู active connections
+ss -tuln             # Linux
+netstat -an          # Windows`,
+              explanation: "ตรวจสอบ network configuration และ connectivity"
+            }
+          ]
+        },
+        {
+          slug: "network-osi-model",
+          title: "OSI Model: 7 Layers ของระบบเครือข่าย",
+          isFree: true,
+          duration: 25,
+          content: `# OSI Model (Open Systems Interconnection)
+
+OSI Model แบ่งการสื่อสาร network ออกเป็น **7 ชั้น** เพื่อให้ทำความเข้าใจและแก้ปัญหาได้ง่าย
+
+## 7 Layers (จากบนลงล่าง)
+
+| Layer | ชื่อ | หน้าที่ | โปรโตคอล |
+|-------|------|---------|---------|
+| 7 | Application | User interface | HTTP, HTTPS, FTP, SMTP |
+| 6 | Presentation | Encoding, Encryption | SSL/TLS, JPEG |
+| 5 | Session | Connection management | NetBIOS |
+| 4 | Transport | End-to-end delivery | TCP, UDP |
+| 3 | Network | Routing, IP addressing | IP, ICMP, OSPF |
+| 2 | Data Link | Frame delivery, MAC | Ethernet, WiFi |
+| 1 | Physical | Bits on wire | Cable, Fiber, WiFi signal |
+
+## จำง่ายๆ
+**"All People Seem To Need Data Processing"**
+(Application, Presentation, Session, Transport, Network, Data Link, Physical)
+
+## Data Encapsulation
+เมื่อส่งข้อมูล แต่ละชั้นเพิ่ม header:
+\`\`\`
+Data → Segment (L4) → Packet (L3) → Frame (L2) → Bits (L1)
+\`\`\``,
+          codeExamples: [
+            {
+              title: "OSI Layer ในทางปฏิบัติ",
+              language: "bash",
+              code: `# Layer 7 (Application): HTTP request
+curl -v https://example.com
+
+# Layer 4 (Transport): ดู TCP connections
+ss -tn  # established TCP connections
+ss -un  # UDP connections
+
+# Layer 3 (Network): ดู IP และ routing
+ip addr                    # IP addresses
+ip route show              # routing table
+traceroute 8.8.8.8        # path ไปยัง Google DNS
+
+# Layer 2 (Data Link): ดู MAC addresses
+arp -a                     # ARP table (IP→MAC mapping)
+ip neigh show              # neighbor cache
+
+# Capture packets (ต้องการ root)
+tcpdump -i eth0 -n
+tcpdump -i eth0 port 80 -A  # HTTP traffic`,
+              explanation: "เครื่องมือตรวจสอบแต่ละ OSI Layer"
+            }
+          ]
+        },
+        {
+          slug: "network-tcpip",
+          title: "TCP/IP Protocol Suite",
+          isFree: false,
+          duration: 25,
+          content: `# TCP/IP Protocol Suite
+
+TCP/IP เป็น **model จริงที่ใช้งานบน Internet** (ต่างจาก OSI ที่เป็น theoretical)
+
+## TCP/IP 4 Layers
+| Layer | OSI เทียบเท่า | โปรโตคอล |
+|-------|---------|---------|
+| Application | 5-7 | HTTP, DNS, SMTP, FTP |
+| Transport | 4 | TCP, UDP |
+| Internet | 3 | IP, ICMP, ARP |
+| Network Access | 1-2 | Ethernet, WiFi |
+
+## TCP vs UDP
+
+### TCP (Transmission Control Protocol)
+- **Connection-oriented**: handshake ก่อนส่ง
+- **Reliable**: รับประกันว่าถึง, ส่งซ้ำถ้า lost
+- **Ordered**: ข้อมูลถึงตามลำดับ
+- **Slower**: overhead สูง
+- ใช้กับ: HTTP, email, file transfer
+
+### UDP (User Datagram Protocol)
+- **Connectionless**: ส่งทันที ไม่ handshake
+- **Unreliable**: ไม่รับประกัน
+- **Faster**: overhead น้อย
+- ใช้กับ: Video streaming, gaming, DNS, VoIP
+
+## TCP Three-Way Handshake
+\`\`\`
+Client → SYN → Server
+Client ← SYN-ACK ← Server
+Client → ACK → Server
+[Connection Established]
+\`\`\``,
+          codeExamples: [
+            {
+              title: "TCP vs UDP ในทางปฏิบัติ",
+              language: "bash",
+              code: `# ดู TCP connections ที่ established
+ss -tn state established
+
+# ดู listening ports
+ss -tlnp   # TCP listening
+ss -ulnp   # UDP listening
+
+# Test TCP connection
+nc -zv google.com 443    # test HTTPS port
+nc -zv google.com 80     # test HTTP port
+
+# netcat server (TCP)
+nc -l 8080               # เปิด TCP listener port 8080
+
+# netcat client
+nc localhost 8080        # connect
+
+# ดู TCP handshake ด้วย tcpdump
+tcpdump -i any 'tcp[tcpflags] & (tcp-syn|tcp-fin) != 0'`,
+              explanation: "ตรวจสอบ TCP/UDP connections"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      title: "บทที่ 2: IP Addressing และ Subnetting",
+      order: 2,
+      lessons: [
+        {
+          slug: "network-ip-addressing",
+          title: "IP Address: IPv4 และ IPv6",
+          isFree: false,
+          duration: 25,
+          content: `# IP Addresses
+
+IP Address คือ **ที่อยู่** ของ device บน network
+
+## IPv4
+- 32-bit number แสดงเป็น 4 octets: \`192.168.1.100\`
+- ทั้งหมด ~4.3 พันล้าน addresses
+- หมดแล้วตั้งแต่ปี 2011
+
+### IPv4 Classes (เก่า ไม่ค่อยใช้แล้ว)
+| Class | Range | ใช้กับ |
+|-------|-------|-------|
+| A | 1.0.0.0 - 126.255.255.255 | ใหญ่มาก |
+| B | 128.0.0.0 - 191.255.255.255 | กลาง |
+| C | 192.0.0.0 - 223.255.255.255 | เล็ก |
+
+### Private IP Ranges (RFC 1918)
+- \`10.0.0.0/8\` — Class A private
+- \`172.16.0.0/12\` — Class B private
+- \`192.168.0.0/16\` — Class C private
+
+## IPv6
+- 128-bit แสดงเป็น hex: \`2001:0db8:85a3::8a2e:0370:7334\`
+- 340 undecillion addresses
+- ไม่ต้องใช้ NAT
+- Built-in security (IPsec)`,
+          codeExamples: [
+            {
+              title: "ตรวจสอบ IP Addresses",
+              language: "bash",
+              code: `# ดู IP addresses ทั้งหมด
+ip addr show
+ip -4 addr   # IPv4 เท่านั้น
+ip -6 addr   # IPv6 เท่านั้น
+
+# ดู public IP
+curl ifconfig.me
+curl api.ipify.org
+
+# ดู IP info
+curl ipinfo.io/8.8.8.8
+
+# Set static IP (Linux, temporary)
+sudo ip addr add 192.168.1.100/24 dev eth0
+
+# ดู interface details
+ip link show
+ethtool eth0`,
+              explanation: "ตรวจสอบ IP addressing ด้วย Linux commands"
+            }
+          ]
+        },
+        {
+          slug: "network-subnetting",
+          title: "Subnetting: แบ่ง Network ย่อย",
+          isFree: false,
+          duration: 30,
+          content: `# Subnetting
+
+Subnetting คือการแบ่ง **network ใหญ่** เป็น networks ย่อยๆ
+
+## Subnet Mask
+บอกว่า bits ไหนเป็น Network portion และ Host portion
+
+\`\`\`
+IP:      192.168.1.100  = 11000000.10101000.00000001.01100100
+Mask:    255.255.255.0  = 11111111.11111111.11111111.00000000
+Network: 192.168.1.0
+Host:    .100
+\`\`\`
+
+## CIDR Notation
+\`192.168.1.0/24\` = subnet mask มี 24 bits เป็น 1
+
+| CIDR | Subnet Mask | Hosts |
+|------|-------------|-------|
+| /24 | 255.255.255.0 | 254 |
+| /25 | 255.255.255.128 | 126 |
+| /26 | 255.255.255.192 | 62 |
+| /27 | 255.255.255.224 | 30 |
+| /28 | 255.255.255.240 | 14 |
+| /30 | 255.255.255.252 | 2 |
+
+## VLSM (Variable Length Subnet Masking)
+ใช้ subnet ขนาดต่างกันให้เหมาะกับแต่ละ network
+
+## Special Addresses
+- **Network address**: host bits = 0 (192.168.1.**0**)
+- **Broadcast**: host bits = 1 (192.168.1.**255**)
+- **Usable hosts**: 2^n - 2`,
+          codeExamples: [
+            {
+              title: "Subnet Calculation",
+              language: "bash",
+              code: `# ipcalc - คำนวณ subnet (ต้องติดตั้งก่อน)
+ipcalc 192.168.1.0/24
+ipcalc 10.0.0.0/8
+
+# Python subnet calculator
+python3 - <<'EOF'
+import ipaddress
+
+# วิเคราะห์ network
+network = ipaddress.ip_network('192.168.1.0/24')
+print(f"Network: {network.network_address}")
+print(f"Broadcast: {network.broadcast_address}")
+print(f"Netmask: {network.netmask}")
+print(f"Hosts: {network.num_addresses - 2}")
+print(f"First host: {list(network.hosts())[0]}")
+print(f"Last host: {list(network.hosts())[-1]}")
+
+# แบ่ง subnet
+for subnet in network.subnets(prefixlen_diff=2):
+    print(subnet)
+EOF`,
+              explanation: "คำนวณ subnets ด้วย ipcalc และ Python"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      title: "บทที่ 3: DNS, HTTP และ Application Layer",
+      order: 3,
+      lessons: [
+        {
+          slug: "network-dns",
+          title: "DNS: ระบบแปลงชื่อ Domain เป็น IP",
+          isFree: false,
+          duration: 25,
+          content: `# DNS (Domain Name System)
+
+DNS คือ **"สมุดโทรศัพท์" ของ Internet** แปลง domain names เป็น IP addresses
+
+## DNS Resolution Process
+\`\`\`
+Browser → DNS Cache → OS Cache → Recursive Resolver
+       → Root Nameserver → TLD Nameserver (.com)
+       → Authoritative Nameserver → IP Address
+\`\`\`
+
+## DNS Record Types
+| Record | หน้าที่ | ตัวอย่าง |
+|--------|---------|---------|
+| **A** | domain → IPv4 | example.com → 93.184.216.34 |
+| **AAAA** | domain → IPv6 | example.com → 2606:28... |
+| **CNAME** | alias | www → example.com |
+| **MX** | mail server | example.com → mail.example.com |
+| **TXT** | text info | SPF, DKIM, verification |
+| **NS** | nameservers | example.com NS ns1.example.com |
+| **PTR** | reverse DNS | IP → domain |
+| **SOA** | zone authority | zone settings |
+
+## TTL (Time To Live)
+บอกว่า DNS cache ได้นานแค่ไหน (วินาที)
+- ค่าน้อย = update เร็ว แต่ query มาก
+- ค่ามาก = cache นาน แต่ update ช้า`,
+          codeExamples: [
+            {
+              title: "DNS Tools",
+              language: "bash",
+              code: `# nslookup
+nslookup google.com
+nslookup google.com 8.8.8.8   # ใช้ Google DNS
+
+# dig (ละเอียดกว่า)
+dig google.com
+dig google.com A               # A record เท่านั้น
+dig google.com MX              # mail records
+dig google.com +short          # แสดงแค่ IP
+dig @8.8.8.8 google.com       # ใช้ specific nameserver
+
+# Reverse DNS lookup
+dig -x 8.8.8.8
+
+# ดู DNS cache
+# Linux systemd-resolved:
+resolvectl statistics
+resolvectl query google.com
+
+# flush DNS cache
+# Linux: sudo systemd-resolve --flush-caches
+# Windows: ipconfig /flushdns
+# macOS: sudo dscacheutil -flushcache
+
+# ดู local DNS config
+cat /etc/resolv.conf`,
+              explanation: "เครื่องมือตรวจสอบ DNS"
+            }
+          ]
+        },
+        {
+          slug: "network-http-https",
+          title: "HTTP/HTTPS: โปรโตคอลหลักของ Web",
+          isFree: false,
+          duration: 30,
+          content: `# HTTP และ HTTPS
+
+HTTP (HyperText Transfer Protocol) คือโปรโตคอลที่ browser และ web server ใช้สื่อสาร
+
+## HTTP Methods
+| Method | หน้าที่ | มี Body? |
+|--------|---------|---------|
+| GET | ดึงข้อมูล | ไม่มี |
+| POST | ส่งข้อมูล/สร้าง | มี |
+| PUT | แทนที่ทั้งหมด | มี |
+| PATCH | แก้ไขบางส่วน | มี |
+| DELETE | ลบ | ไม่มี |
+| HEAD | เหมือน GET แต่ไม่มี body | ไม่มี |
+| OPTIONS | ถามว่า methods ไหนรองรับ | ไม่มี |
+
+## HTTP Status Codes
+| Range | ความหมาย |
+|-------|---------|
+| 1xx | Informational |
+| 2xx | Success (200 OK, 201 Created) |
+| 3xx | Redirect (301 Moved, 302 Found) |
+| 4xx | Client Error (400 Bad Request, 401 Unauthorized, 404 Not Found) |
+| 5xx | Server Error (500 Internal Server Error, 503 Service Unavailable) |
+
+## HTTP vs HTTPS
+- HTTP: plain text, port 80
+- HTTPS: encrypted (TLS/SSL), port 443
+
+## HTTP/1.1 vs HTTP/2 vs HTTP/3
+- **HTTP/1.1**: 1 request per connection, text-based
+- **HTTP/2**: multiplexing, header compression, binary
+- **HTTP/3**: UDP-based (QUIC), faster handshake`,
+          codeExamples: [
+            {
+              title: "HTTP ด้วย curl",
+              language: "bash",
+              code: `# GET request
+curl https://api.github.com/users/octocat
+
+# POST request พร้อม JSON
+curl -X POST https://api.example.com/users \\
+  -H "Content-Type: application/json" \\
+  -d '{"name":"John","email":"john@example.com"}'
+
+# ดู response headers
+curl -I https://google.com
+
+# ดูทั้ง request และ response headers
+curl -v https://google.com
+
+# follow redirects
+curl -L http://google.com
+
+# ส่ง auth token
+curl -H "Authorization: Bearer mytoken" \\
+  https://api.example.com/profile
+
+# ดู HTTP version
+curl --http2 -v https://example.com 2>&1 | grep "< HTTP"
+curl --http3 https://example.com`,
+              explanation: "ทดสอบ HTTP requests ด้วย curl"
+            }
+          ]
+        },
+        {
+          slug: "network-tls-ssl",
+          title: "TLS/SSL: การเข้ารหัส HTTPS",
+          isFree: false,
+          duration: 25,
+          content: `# TLS/SSL
+
+TLS (Transport Layer Security) คือโปรโตคอลที่ทำให้ HTTP กลายเป็น **HTTPS**
+
+## TLS Handshake (TLS 1.3)
+\`\`\`
+1. Client Hello (supported cipher suites, random)
+2. Server Hello (chosen cipher, certificate, random)
+3. Certificate verification (client ตรวจ cert)
+4. Key exchange → shared secret
+5. Encrypted communication
+\`\`\`
+
+## SSL/TLS Certificates
+- **DV (Domain Validation)**: ตรวจแค่ว่า control domain
+- **OV (Organization Validation)**: ตรวจ organization ด้วย
+- **EV (Extended Validation)**: ตรวจละเอียดที่สุด
+
+## Certificate Authority (CA)
+- Let's Encrypt (ฟรี, automated)
+- DigiCert, Comodo (เสียเงิน)
+
+## Self-signed Certificate
+สำหรับ development/internal เท่านั้น
+
+## Perfect Forward Secrecy (PFS)
+แม้ private key ถูก compromise session keys เก่าก็ยังปลอดภัย`,
+          codeExamples: [
+            {
+              title: "ตรวจสอบ TLS Certificates",
+              language: "bash",
+              code: `# ดู certificate ของ website
+openssl s_client -connect google.com:443 </dev/null
+
+# ดูรายละเอียด certificate
+echo | openssl s_client -connect google.com:443 2>/dev/null \\
+  | openssl x509 -noout -text
+
+# ดูวันหมดอายุ
+echo | openssl s_client -connect google.com:443 2>/dev/null \\
+  | openssl x509 -noout -dates
+
+# สร้าง self-signed certificate (development)
+openssl req -x509 -newkey rsa:4096 \\
+  -keyout key.pem -out cert.pem \\
+  -days 365 -nodes \\
+  -subj "/CN=localhost"
+
+# Let's Encrypt ด้วย certbot
+sudo certbot --nginx -d example.com -d www.example.com
+
+# ดู cipher suites ที่รองรับ
+nmap --script ssl-enum-ciphers -p 443 google.com`,
+              explanation: "ตรวจสอบและจัดการ TLS certificates"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      title: "บทที่ 4: Network Security",
+      order: 4,
+      lessons: [
+        {
+          slug: "network-firewall",
+          title: "Firewall: ปกป้อง Network",
+          isFree: false,
+          duration: 25,
+          content: `# Firewall
+
+Firewall คือ **ระบบกรอง network traffic** ตาม rules ที่กำหนด
+
+## ประเภท Firewall
+1. **Packet Filter**: ตรวจ IP, port, protocol (Layer 3-4)
+2. **Stateful Inspection**: track connections state
+3. **Application Firewall (WAF)**: ตรวจ HTTP content (Layer 7)
+4. **Next-Gen Firewall (NGFW)**: รวมทุกอย่าง + DPI, IPS
+
+## Firewall Rules
+\`\`\`
+Direction: INBOUND / OUTBOUND
+Protocol: TCP / UDP / ICMP / ANY
+Source IP: specific IP / range / ANY
+Destination Port: 80, 443, 22 / range
+Action: ALLOW / DENY / DROP
+\`\`\`
+
+## iptables (Linux)
+\`\`\`
+Tables: filter, nat, mangle
+Chains: INPUT, OUTPUT, FORWARD
+\`\`\`
+
+## ufw (Uncomplicated Firewall)
+Frontend สำหรับ iptables ที่ใช้ง่ายกว่า`,
+          codeExamples: [
+            {
+              title: "ตั้งค่า Firewall ด้วย ufw",
+              language: "bash",
+              code: `# ดู status
+sudo ufw status verbose
+
+# เปิดใช้งาน
+sudo ufw enable
+
+# Default policies
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+
+# Allow specific ports
+sudo ufw allow 22/tcp      # SSH
+sudo ufw allow 80/tcp      # HTTP
+sudo ufw allow 443/tcp     # HTTPS
+sudo ufw allow 5432/tcp    # PostgreSQL
+
+# Allow from specific IP
+sudo ufw allow from 192.168.1.0/24
+
+# Allow range
+sudo ufw allow 8000:9000/tcp
+
+# ลบ rule
+sudo ufw delete allow 8080
+
+# ดู numbered rules
+sudo ufw status numbered
+sudo ufw delete 3
+
+# iptables ขั้นสูง
+sudo iptables -L -n -v        # ดู rules
+sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT`,
+              explanation: "ตั้งค่า firewall ด้วย ufw และ iptables"
+            }
+          ]
+        },
+        {
+          slug: "network-vpn-security",
+          title: "VPN และ Network Security Advanced",
+          isFree: false,
+          duration: 30,
+          content: `# VPN และ Network Security
+
+## VPN (Virtual Private Network)
+
+VPN สร้าง **encrypted tunnel** ผ่าน internet ราวกับว่าอยู่ใน private network เดียวกัน
+
+### ประเภท VPN
+- **Site-to-Site**: เชื่อม 2 offices
+- **Remote Access**: user เข้า corporate network
+- **SSL VPN**: ผ่าน browser (HTTPS)
+
+### VPN Protocols
+| Protocol | ความปลอดภัย | Speed | ใช้กับ |
+|----------|------------|-------|-------|
+| OpenVPN | สูง | กลาง | ทั่วไป |
+| WireGuard | สูงมาก | เร็ว | Modern |
+| IPSec/IKEv2 | สูง | เร็ว | Mobile |
+| L2TP/IPSec | กลาง | ปานกลาง | Legacy |
+
+## Common Network Attacks
+- **DDoS**: flood traffic ทำให้ service ล่ม
+- **Man-in-the-Middle**: แทรกกลางการสื่อสาร
+- **ARP Spoofing**: แอบอ้าง MAC address
+- **DNS Poisoning**: ส่ง DNS response ปลอม
+- **Port Scanning**: สแกนหา open ports
+- **Packet Sniffing**: ดักจับ traffic
+
+## Defense in Depth
+ป้องกันหลายชั้น:
+1. Perimeter firewall
+2. Network segmentation (VLANs)
+3. Intrusion Detection System (IDS)
+4. Endpoint security
+5. Encryption
+6. Monitoring และ Logging`,
+          codeExamples: [
+            {
+              title: "ติดตั้ง WireGuard VPN",
+              language: "bash",
+              code: `# ติดตั้ง WireGuard (Ubuntu)
+sudo apt install wireguard
+
+# สร้าง key pair บน server
+wg genkey | tee server_private.key | wg pubkey > server_public.key
+
+# สร้าง key pair บน client
+wg genkey | tee client_private.key | wg pubkey > client_public.key
+
+# Server config /etc/wireguard/wg0.conf
+cat > /etc/wireguard/wg0.conf << EOF
+[Interface]
+Address = 10.0.0.1/24
+ListenPort = 51820
+PrivateKey = $(cat server_private.key)
+PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+
+[Peer]
+PublicKey = $(cat client_public.key)
+AllowedIPs = 10.0.0.2/32
+EOF
+
+# เริ่ม WireGuard
+sudo systemctl enable wg-quick@wg0
+sudo systemctl start wg-quick@wg0
+
+# ดู status
+sudo wg show`,
+              explanation: "ติดตั้งและตั้งค่า WireGuard VPN server"
+            },
+            {
+              title: "Network Security Tools",
+              language: "bash",
+              code: `# nmap - port scanner
+nmap -sV localhost              # scan localhost
+nmap -p 80,443,22 example.com  # scan specific ports
+nmap -A -T4 192.168.1.0/24    # aggressive scan ทั้ง subnet
+
+# Wireshark / tshark - packet analyzer
+tshark -i eth0 -f "port 80"   # capture HTTP
+tshark -i eth0 -w capture.pcap  # บันทึก file
+
+# ดู open ports
+ss -tlnp   # TCP listening
+ss -ulnp   # UDP listening
+
+# Fail2ban - block brute force
+sudo apt install fail2ban
+sudo systemctl start fail2ban
+sudo fail2ban-client status sshd
+
+# ดู suspicious connections
+ss -tn | grep ESTABLISHED
+netstat -an | grep LISTEN`,
+              explanation: "Security tools สำหรับ network monitoring"
+            }
+          ]
+        },
+        {
+          slug: "network-load-balancing",
+          title: "Load Balancing และ High Availability",
+          isFree: false,
+          duration: 25,
+          content: `# Load Balancing
+
+Load Balancer กระจาย traffic ไปยัง **หลาย servers** เพื่อ performance และ availability
+
+## Load Balancing Algorithms
+| Algorithm | ลักษณะ | เมื่อใช้ |
+|-----------|--------|---------|
+| **Round Robin** | เวียนทั่ว | servers เหมือนกัน |
+| **Least Connections** | server ที่ว่างที่สุด | sessions ยาว |
+| **IP Hash** | user เดิม → server เดิม | sticky sessions |
+| **Weighted** | server แรงกว่าได้มากกว่า | hardware ต่างกัน |
+| **Random** | สุ่ม | เหมือน Round Robin |
+
+## L4 vs L7 Load Balancing
+- **L4 (Transport)**: ดู IP:Port เท่านั้น เร็ว
+- **L7 (Application)**: ดู HTTP headers, cookies ได้ ยืดหยุ่นกว่า
+
+## High Availability (HA)
+- **Active-Passive**: standby server คอยอยู่
+- **Active-Active**: ทั้งคู่ทำงาน
+
+## Health Checks
+LB ต้อง check ว่า server ยังทำงานอยู่:
+\`\`\`
+TCP check: เชื่อมต่อได้ไหม
+HTTP check: GET /health → 200 OK
+\`\`\``,
+          codeExamples: [
+            {
+              title: "Nginx Load Balancer",
+              language: "bash",
+              code: `# nginx.conf - upstream load balancing
+cat > /etc/nginx/nginx.conf << 'EOF'
+http {
+  # กำหนด upstream servers
+  upstream backend {
+    least_conn;  # least connections algorithm
+
+    server backend1.example.com:3000 weight=3;
+    server backend2.example.com:3000 weight=1;
+    server backend3.example.com:3000 backup;  # failover เท่านั้น
+
+    keepalive 32;
+  }
+
+  server {
+    listen 80;
+    server_name example.com;
+
+    location / {
+      proxy_pass http://backend;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+      # Health check timeout
+      proxy_connect_timeout 5s;
+      proxy_read_timeout 30s;
+    }
+
+    location /health {
+      access_log off;
+      return 200 "healthy\\n";
+    }
+  }
+}
+EOF
+
+# reload nginx
+sudo nginx -t
+sudo systemctl reload nginx
+
+# ดู nginx status
+sudo nginx -s status`,
+              explanation: "ตั้งค่า Nginx เป็น Load Balancer"
+            }
+          ]
+        }
+      ]
+    }
+  ];
+
+  await seedCourse(courseId, "Network Fundamentals", sections);
 }
 
 main()
