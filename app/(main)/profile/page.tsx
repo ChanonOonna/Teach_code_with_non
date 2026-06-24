@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Camera, Save, User, Mail, AtSign, Shield, Settings } from "lucide-react";
+import { Camera, Save, User, Mail, AtSign, Shield, Settings, Award, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,10 +14,20 @@ import { updateProfileSchema, type UpdateProfileInput } from "@/lib/validations"
 import { formatDate } from "@/lib/utils";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import type { Certificate } from "@/types";
 
 export default function ProfilePage() {
   const { user, accessToken, updateUser } = useAuthStore();
   const [saving, setSaving] = useState(false);
+  const [certificates, setCertificates] = useState<Certificate[]>([]);
+
+  useEffect(() => {
+    if (!accessToken) return;
+    fetch("/api/certificates", { headers: { Authorization: `Bearer ${accessToken}` } })
+      .then(r => r.json())
+      .then(data => { if (data.success) setCertificates(data.data ?? []); })
+      .catch(() => {});
+  }, [accessToken]);
 
   const {
     register,
@@ -167,6 +177,54 @@ export default function ProfilePage() {
                   <Link href="/settings">เปลี่ยนรหัสผ่าน</Link>
                 </Button>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Certificates */}
+          <Card>
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Award className="h-4 w-4 text-amber-500" /> ใบประกาศนียบัตร
+                {certificates.length > 0 && (
+                  <Badge variant="warning" className="ml-auto">{certificates.length} ใบ</Badge>
+                )}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {certificates.length === 0 ? (
+                <div className="text-center py-6">
+                  <Award className="h-10 w-10 text-muted-foreground/30 mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">ยังไม่มีใบประกาศ — เรียนจบคอร์สเพื่อรับใบประกาศ!</p>
+                  <Button variant="gradient" size="sm" className="mt-3" asChild>
+                    <Link href="/courses">ไปเรียนเลย</Link>
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {certificates.map((cert) => (
+                    <div key={cert.id} className="flex items-center justify-between p-3 rounded-xl border bg-amber-50/50 dark:bg-amber-900/10 border-amber-200/50 dark:border-amber-800/30">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0 shadow-sm">
+                          <Award className="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm line-clamp-1">{(cert.course as { title: string } | undefined)?.title ?? "คอร์ส"}</p>
+                          <p className="text-xs text-muted-foreground">ออกให้เมื่อ {formatDate(cert.issuedAt)}</p>
+                        </div>
+                      </div>
+                      {cert.certificateUrl ? (
+                        <Button variant="ghost" size="icon-sm" asChild title="ดูใบประกาศ">
+                          <a href={cert.certificateUrl} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="h-4 w-4" />
+                          </a>
+                        </Button>
+                      ) : (
+                        <Badge variant="outline" className="text-xs shrink-0">เสร็จแล้ว</Badge>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
