@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -157,7 +157,7 @@ model Lesson {
   section     Section     @relation(fields: [sectionId], references: [id], onDelete: Cascade)
   slug        String      @unique
   title       String
-  content     String      @db.LongText
+  content     String      @db.Text
   videoUrl    String?
   duration    Int         @default(0)
   order       Int         @default(0)
@@ -190,7 +190,7 @@ model CodeExample {
   lessonId    String
   lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   title       String
-  code        String   @db.LongText
+  code        String   @db.Text
   language    String
   explanation String?  @db.Text
   order       Int      @default(0)
@@ -328,8 +328,8 @@ model Assignment {
   lessonId     String
   lesson       Lesson     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   title        String
-  description  String     @db.LongText
-  starterCode  String?    @db.LongText
+  description  String     @db.Text
+  starterCode  String?    @db.Text
   language     String
   expectedOutput String?  @db.Text
   hints        String?    @db.Text
@@ -349,7 +349,7 @@ model AssignmentSubmission {
   assignment   Assignment       @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
   userId       String
   user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  code         String           @db.LongText
+  code         String           @db.Text
   output       String?          @db.Text
   score        Float?
   feedback     String?          @db.Text
