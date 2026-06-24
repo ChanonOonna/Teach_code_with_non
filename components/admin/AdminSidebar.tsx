@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Users, BookOpen, FileText,
-  HelpCircle, BarChart3, Settings, Code2, LogOut, History,
+  HelpCircle, BarChart3, Settings, Code2, LogOut, History, GraduationCap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/hooks/useAuthStore";
@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/users", label: "ผู้ใช้", icon: Users },
+  { href: "/admin/students", label: "ความก้าวหน้า", icon: GraduationCap },
   { href: "/admin/courses", label: "คอร์ส", icon: BookOpen },
   { href: "/admin/lessons", label: "บทเรียน", icon: FileText },
   { href: "/admin/quizzes", label: "Quiz", icon: HelpCircle },
