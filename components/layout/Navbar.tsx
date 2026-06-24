@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
@@ -23,8 +23,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+interface NotifItem {
+  id: string;
+  title: string;
+  message: string;
+  type: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
 export default function Navbar() {
-  const { user, logout } = useAuthStore();
+  const { user, logout, accessToken } = useAuthStore();
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
   const router = useRouter();
@@ -32,12 +41,38 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [notifications, setNotifications] = useState<NotifItem[]>([]);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const notifRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (!accessToken) return;
+    fetch("/api/notifications", { headers: { Authorization: `Bearer ${accessToken}` } })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          setNotifications(data.data.notifications ?? []);
+          setUnreadCount(data.data.unreadCount ?? 0);
+        }
+      }).catch(() => {});
+  }, [accessToken]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setNotifOpen(false);
+      }
+    };
+    if (notifOpen) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [notifOpen]);
 
   const navLinks = [
     { href: "/", label: "หน้าแรก" },
@@ -57,6 +92,17 @@ export default function Navbar() {
   const handleLogout = async () => {
     await logout();
     router.push("/");
+  };
+
+  const handleNotifOpen = () => {
+    const next = !notifOpen;
+    setNotifOpen(next);
+    if (next && unreadCount > 0) {
+      fetch("/api/notifications", {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }).then(() => setUnreadCount(0)).catch(() => {});
+    }
   };
 
   return (
@@ -132,12 +178,45 @@ export default function Navbar() {
           {user ? (
             <>
               {/* Notifications */}
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
-                <Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px]">
-                  3
-                </Badge>
-              </Button>
+              <div className="relative" ref={notifRef}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative"
+                  onClick={handleNotifOpen}
+                >
+                  <Bell className="h-5 w-5" />
+                  {unreadCount > 0 && (
+                    <Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px]">
+                      {unreadCount}
+                    </Badge>
+                  )}
+                </Button>
+                {notifOpen && (
+                  <div className="absolute right-0 top-12 w-80 bg-background border rounded-xl shadow-xl z-50 overflow-hidden">
+                    <div className="px-4 py-3 border-b flex items-center justify-between">
+                      <span className="font-semibold text-sm">การแจ้งเตือน</span>
+                      <button onClick={() => setNotifOpen(false)} className="text-muted-foreground hover:text-foreground">
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <div className="max-h-80 overflow-y-auto">
+                      {notifications.length === 0 ? (
+                        <div className="px-4 py-8 text-center text-sm text-muted-foreground">
+                          ยังไม่มีการแจ้งเตือน
+                        </div>
+                      ) : (
+                        notifications.map(n => (
+                          <div key={n.id} className={cn("px-4 py-3 border-b last:border-0 hover:bg-muted/50", !n.isRead && "bg-primary/5")}>
+                            <p className="text-sm font-medium">{n.title}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">{n.message}</p>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* User Menu */}
               <DropdownMenu>

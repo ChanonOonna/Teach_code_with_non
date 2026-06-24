@@ -25,8 +25,37 @@ export default function AssignmentSection({ assignment }: AssignmentSectionProps
   const [showHints, setShowHints] = useState(false);
   const [running, setRunning] = useState(false);
 
+  const runJSInBrowser = (src: string): string => {
+    const lines: string[] = [];
+    const capture = (...args: unknown[]) => {
+      lines.push(args.map(a => {
+        if (a === null) return "null";
+        if (a === undefined) return "undefined";
+        if (typeof a === "object") { try { return JSON.stringify(a, null, 2); } catch { return String(a); } }
+        return String(a);
+      }).join(" "));
+    };
+    const orig = { log: console.log, error: console.error, warn: console.warn, info: console.info };
+    console.log = capture;
+    console.error = (...a: unknown[]) => capture("❌", ...a);
+    console.warn = (...a: unknown[]) => capture("⚠️", ...a);
+    console.info = capture;
+    try { new Function(src)(); }
+    catch (e) { lines.push(`❌ ${e instanceof Error ? e.message : String(e)}`); }
+    finally { Object.assign(console, orig); }
+    return lines.length > 0 ? lines.join("\n") : "(ไม่มี output)";
+  };
+
   const handleRun = async () => {
     setRunning(true);
+    const lang = assignment.language.toLowerCase();
+    if (["javascript", "js", "typescript", "ts"].includes(lang)) {
+      setTimeout(() => {
+        setOutput(runJSInBrowser(code));
+        setRunning(false);
+      }, 50);
+      return;
+    }
     try {
       const res = await fetch("/api/playground/run", {
         method: "POST",

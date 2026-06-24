@@ -14,9 +14,32 @@ export default function AdminSettingsPage() {
   const [siteDesc, setSiteDesc] = useState("แพลตฟอร์มสอนเขียนโปรแกรมออนไลน์");
   const [supportEmail, setSupportEmail] = useState("support@teachcode.dev");
   const [maxFreeEnroll, setMaxFreeEnroll] = useState("3");
+  const [dbTesting, setDbTesting] = useState(false);
+  const [dbStatus, setDbStatus] = useState<"idle" | "ok" | "error">("idle");
 
   const handleSave = () => {
     toast.success("บันทึกการตั้งค่าแล้ว");
+  };
+
+  const handleDbTest = async () => {
+    setDbTesting(true);
+    setDbStatus("idle");
+    try {
+      const res = await fetch("/api/admin/db-test");
+      const data = await res.json();
+      if (data.success) {
+        setDbStatus("ok");
+        toast.success(`เชื่อมต่อสำเร็จ — ${data.data.userCount} users, ${data.data.courseCount} courses`);
+      } else {
+        setDbStatus("error");
+        toast.error(data.error ?? "ไม่สามารถเชื่อมต่อได้");
+      }
+    } catch {
+      setDbStatus("error");
+      toast.error("เชื่อมต่อฐานข้อมูลล้มเหลว");
+    } finally {
+      setDbTesting(false);
+    }
   };
 
   return (
@@ -131,10 +154,12 @@ export default function AdminSettingsPage() {
               <p className="font-medium text-sm">สถานะ Database</p>
               <p className="text-xs text-muted-foreground font-mono">MySQL — Prisma ORM</p>
             </div>
-            <Badge variant="success">เชื่อมต่อแล้ว</Badge>
+            <Badge variant={dbStatus === "ok" ? "success" : dbStatus === "error" ? "destructive" : "success"}>
+              {dbStatus === "ok" ? "เชื่อมต่อแล้ว" : dbStatus === "error" ? "ข้อผิดพลาด" : "เชื่อมต่อแล้ว"}
+            </Badge>
           </div>
-          <Button variant="outline" className="w-full gap-2">
-            <Database className="h-4 w-4" /> ทดสอบการเชื่อมต่อ
+          <Button variant="outline" className="w-full gap-2" onClick={handleDbTest} disabled={dbTesting}>
+            <Database className="h-4 w-4" /> {dbTesting ? "กำลังทดสอบ..." : "ทดสอบการเชื่อมต่อ"}
           </Button>
         </CardContent>
       </Card>

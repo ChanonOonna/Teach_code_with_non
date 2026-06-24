@@ -93,7 +93,10 @@ export default function ProfilePage() {
                 {initials}
               </AvatarFallback>
             </Avatar>
-            <button className="absolute bottom-0 right-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white shadow-lg hover:bg-primary/90 transition-colors">
+            <button
+              className="absolute bottom-0 right-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white shadow-lg hover:bg-primary/90 transition-colors"
+              onClick={() => toast("อัปโหลดรูปภาพ: เชื่อมต่อ Cloudinary ใน .env เพื่อเปิดใช้งาน", { icon: "📷" })}
+            >
               <Camera className="h-4 w-4" />
             </button>
           </div>
