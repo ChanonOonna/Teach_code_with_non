@@ -34,10 +34,28 @@ function b64decode(str: string | null | undefined): string {
   return Buffer.from(str, "base64").toString("utf-8");
 }
 
+// Judge0 status_id reference
+const JUDGE0_STATUS: Record<number, string> = {
+  5: "⏱️ Time Limit Exceeded",
+  6: "❌ Compilation Error",
+  7: "❌ Runtime Error (SIGSEGV)",
+  8: "❌ Runtime Error (SIGFPE)",
+  9: "❌ Runtime Error (SIGABRT)",
+  10: "❌ Runtime Error (NZEC)",
+  11: "❌ Runtime Error (Other)",
+  12: "❌ Runtime Error (Internal)",
+  13: "❌ Internal Error",
+  14: "❌ Exec Format Error",
+};
+
+const FETCH_TIMEOUT_MS = 15_000;
+const MAX_CODE_LENGTH = 50_000;
+
 export async function POST(req: NextRequest) {
   try {
     const { code, language } = await req.json();
     if (!code) return apiError("กรุณาใส่โค้ด", 400);
+    if (code.length > MAX_CODE_LENGTH) return apiError("โค้ดยาวเกินไป (สูงสุด 50,000 ตัวอักษร)", 400);
 
     const lang = language?.toLowerCase() ?? "python";
 
@@ -49,21 +67,35 @@ export async function POST(req: NextRequest) {
     const langId = JUDGE0_LANG[lang];
     if (!langId) return apiError(`ไม่รองรับภาษา ${language}`, 400);
 
-    // Use base64 encoding to safely send Thai and Unicode characters
-    const submitRes = await fetch(
-      `${JUDGE0_API}/submissions?base64_encoded=true&wait=true`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          source_code: b64encode(code),
-          language_id: langId,
-          stdin: "",
-          cpu_time_limit: 5,
-          memory_limit: 128000,
-        }),
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+    let submitRes: Response;
+    try {
+      // Use base64 encoding to safely send Thai and Unicode characters
+      submitRes = await fetch(
+        `${JUDGE0_API}/submissions?base64_encoded=true&wait=true`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            source_code: b64encode(code),
+            language_id: langId,
+            stdin: "",
+            cpu_time_limit: 5,
+            memory_limit: 128000,
+          }),
+          signal: controller.signal,
+        }
+      );
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === "AbortError") {
+        return apiError("การรันโค้ดใช้เวลานานเกินไป กรุณาลองใหม่", 504);
       }
-    );
+      throw err;
+    } finally {
+      clearTimeout(timeout);
+    }
 
     if (!submitRes.ok) {
       const errText = await submitRes.text().catch(() => "");
@@ -73,9 +105,17 @@ export async function POST(req: NextRequest) {
 
     const result = await submitRes.json();
 
+    const statusId: number = result.status?.id ?? 0;
     const stdout = b64decode(result.stdout);
     const stderr = b64decode(result.stderr);
     const compileOutput = b64decode(result.compile_output);
+
+    // statusId 3 = Accepted, 4 = Wrong Answer (treated as normal output)
+    if (statusId >= 5 && JUDGE0_STATUS[statusId]) {
+      const detail = compileOutput || stderr || "";
+      const output = `${JUDGE0_STATUS[statusId]}${detail ? `\n${detail}` : ""}`;
+      return apiSuccess({ output: output.trim(), exitCode: result.exit_code ?? 1, language: lang, time: result.time });
+    }
 
     let output = stdout;
     if (compileOutput) output += (output ? "\n" : "") + `⚠️ Compile:\n${compileOutput}`;

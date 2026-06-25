@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight, Code2, BookOpen, Users, Award, Zap,
-  Star, TrendingUp, Globe, Cpu, Database, Smartphone,
+  TrendingUp, Globe, Cpu, Database, Smartphone,
   CheckCircle2, Sparkles, Terminal, Play,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -42,11 +42,6 @@ const paths = [
   { icon: Database, title: "Full Stack", desc: "Frontend + Backend + Database + Deployment ครบจบ", gradient: "from-violet-600 to-purple-600", tags: ["Next.js", "MySQL", "Docker"], href: "/courses" },
 ];
 
-const testimonials = [
-  { name: "กิตติพัฒน์ มงคล", role: "Junior Frontend Developer", content: "TeachCode ทำให้ผมเรียน React และ Next.js ได้เร็วมาก บทเรียนอ่านง่าย มีตัวอย่างโค้ดชัดเจน ใช้เวลา 2 เดือนได้งานเลย!", rating: 5, avatar: "ก", color: "from-blue-500 to-indigo-500" },
-  { name: "ปิยะนันท์ สุขใจ", role: "Python Developer", content: "ชอบระบบ Quiz มากๆ ช่วยให้จำได้ดีขึ้น Code Playground ใช้ง่ายมาก ทดลองโค้ดได้เลยไม่ต้องติดตั้งอะไร", rating: 5, avatar: "ป", color: "from-violet-500 to-purple-500" },
-  { name: "วรรณิกา ทองดี", role: "CS Student, จุฬาลงกรณ์", content: "เรียนจากศูนย์ไม่รู้โปรแกรมมิ่งเลย แต่พอเรียน Section แรกก็เขียน C ได้แล้ว อธิบายเป็นภาษาไทยเข้าใจง่ายมาก", rating: 5, avatar: "ว", color: "from-pink-500 to-rose-500" },
-];
 
 async function getFeaturedCourses() {
   try {
@@ -221,41 +216,6 @@ export default async function HomePage() {
                   <p className="text-sm text-muted-foreground leading-relaxed">{feature.desc}</p>
                 </CardContent>
               </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── TESTIMONIALS ──────────────────────────────── */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <Badge variant="secondary" className="mb-3">รีวิว</Badge>
-            <h2 className="text-3xl md:text-4xl font-bold mb-3">เสียงจากนักเรียน</h2>
-            <p className="text-muted-foreground">ประสบการณ์จริงจากคนที่เรียนกับเรา</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((t) => (
-              <div key={t.name} className="glass-card p-6 card-hover">
-                {/* Stars */}
-                <div className="flex gap-0.5 mb-4">
-                  {Array.from({ length: t.rating }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-6 italic">
-                  &ldquo;{t.content}&rdquo;
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${t.color} flex items-center justify-center text-white font-bold text-sm shadow-md`}>
-                    {t.avatar}
-                  </div>
-                  <div>
-                    <div className="font-semibold text-sm">{t.name}</div>
-                    <div className="text-xs text-muted-foreground">{t.role}</div>
-                  </div>
-                </div>
-              </div>
             ))}
           </div>
         </div>

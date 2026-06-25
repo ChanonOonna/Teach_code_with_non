@@ -36,7 +36,11 @@ export async function POST(req: NextRequest) {
     const maxOrder = await prisma.course.aggregate({ _max: { order: true } });
     const course = await prisma.course.create({
       data: {
-        title, slug, description: description ?? "", language, level,
+        title,
+        slug,
+        description: description ?? "",
+        language,
+        level,
         estimatedHours: estimatedHours ?? 0,
         order: (maxOrder._max.order ?? 0) + 1,
         isPublished: false,
